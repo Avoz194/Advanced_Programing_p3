@@ -9,8 +9,8 @@ public abstract class  ClientCommand implements Commands {
     public String getUserName(){return userName;}
     public void setUserName(String name){ userName=name;}
     public int getOpCode(){return opCode;}
-    protected ServerCommand error(){return new ERR(opCode);}
-    protected ServerCommand succAction(){return new ACK(opCode);}
+    protected ERR error(){return new ERR(opCode);}
+    protected ACK succAction(){return new ACK(opCode);}
 
     public abstract ServerCommand execute();
 }

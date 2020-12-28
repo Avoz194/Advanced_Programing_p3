@@ -1,5 +1,8 @@
 package bgu.spl.net.impl.BGRSServer.DB;
 
+import java.util.ArrayList;
+import java.util.NoSuchElementException;
+
 public class Database {
 
     private String pathCourses;
@@ -7,7 +10,7 @@ public class Database {
     private ConcurrentHashMap<String, User> usersDB;
     private ReadWriteLock readWriteLockCourses;
     private ReadWriteLock readWriteLockUsers;
-    private List<Integer> courseOrder;
+    private List<Integer> courseOrder;   //TODO: sure list is an object?
 
 
     //to prevent user from creating new Database
@@ -78,16 +81,22 @@ public class Database {
         }
     }
 
+    //DB functions:
     public boolean isAdmin(String userName) {//TODO:implement
         return true;
     } //TODO:imlement
 
-
-
-    public boolean registerNewUser(String userName, String password,boolean isAdmin) {
+    public boolean registerNewUser(String userName, String password, boolean isAdmin) {
         return true;
     }//TODO:implement
 
+    public boolean registerToCourse(String userName, int courseNumber) {
+        return true;
+    }//TODO:implement
+
+    public boolean unRegisterFromCourse(String userName, int courseNumber) {
+        return true;
+    }//TODO:implement
 
     public boolean logInUser(String userName, String password) {
         return true;
@@ -96,4 +105,24 @@ public class Database {
     public boolean logOutUser(String userName) { //TODO:imlement
         return true;
     }
+
+    public String getKdamForCourse(int courseNumber) throws NoSuchElementException {
+        return null;
+    }//TODO:implement
+    public String getMyCourses(String userName) throws NoSuchElementException {
+        return null;
+    }//TODO:implement
+
+    public boolean isRegisteredForCourse(String userName, int courseNumber) throws NoSuchElementException {
+        return true;
+    }//TODO:implement
+    public String getCourseStat(int courseNumber) throws NoSuchElementException {
+        return null;
+    }//TODO:implement
+
+    public String getStudentStat(String studentName) throws NoSuchElementException {
+        return null;
+    }//TODO:implement
+
+
 }

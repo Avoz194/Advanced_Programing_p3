@@ -6,7 +6,7 @@ public class ACK extends ServerCommand {
     private String optionalMsg=null;
 
     public ACK(int messageOpcode) {
-        super(13, messageOpcode);
+        super(12, messageOpcode);
     }
     public void setOptionalMsg(String msg){optionalMsg=msg;}
 
