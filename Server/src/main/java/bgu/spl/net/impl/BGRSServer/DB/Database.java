@@ -13,7 +13,7 @@ public class Database {
 
 	//to prevent user from creating new Database
 	private Database() {
-		// TODO: implement
+		// TODO: implement - make sure threadSafe singelton?
 		pathCourses = this.pathCourses;
 		coursesDB = new ConcurrentHashMap<Integer,Course>();
 		usersDB = new ConcurrentHashMap<Integer,User>();
@@ -78,7 +78,7 @@ public class Database {
 			return false;
 		}
 	}
-    public boolean isAdmin(String userName){
+    public boolean isAdmin(String userName){//TODO:implement
         return true;
     }
 }
