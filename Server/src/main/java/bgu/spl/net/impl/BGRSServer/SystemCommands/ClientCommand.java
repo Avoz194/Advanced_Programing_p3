@@ -1,4 +1,4 @@
 package bgu.spl.net.impl.BGRSServer.SystemCommands;
 
-public abstract class  ServerCommand extends Command{
+public abstract class  ClientCommand extends Command{
 }

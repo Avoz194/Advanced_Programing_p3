@@ -1,4 +1,4 @@
 package bgu.spl.net.impl.BGRSServer.SystemCommands;
 
-public interface AdminCommand {
+public abstract class  AdminCommand extends Command{
 }

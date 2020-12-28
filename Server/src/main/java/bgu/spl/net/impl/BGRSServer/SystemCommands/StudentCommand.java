@@ -1,4 +1,4 @@
 package bgu.spl.net.impl.BGRSServer.SystemCommands;
 
-public interface StudentCommand {
+public abstract class  StudentCommand extends Command {
 }
