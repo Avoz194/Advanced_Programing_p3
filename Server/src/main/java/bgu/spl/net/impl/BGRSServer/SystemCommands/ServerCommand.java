@@ -13,6 +13,5 @@ public abstract class ServerCommand implements Commands {
         return opCode;
     }
 
-
     public abstract String encode(); //TODO: consider if needed for encdec
 }
