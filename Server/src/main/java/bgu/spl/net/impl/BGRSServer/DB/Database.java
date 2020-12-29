@@ -1,73 +1,94 @@
 package bgu.spl.net.impl.BGRSServer.DB;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
 
 public class Database {
+    private static class SingletonHolder {
+        private static Database instance = new Database(getInstance().pathCourses, getInstance().readWriteLockCourses, getInstance().readWriteLockCourses);
+    }
 
     private String pathCourses;
     private ConcurrentHashMap<Integer, Course> coursesDB;
     private ConcurrentHashMap<String, User> usersDB;
     private ReadWriteLock readWriteLockCourses;
     private ReadWriteLock readWriteLockUsers;
-    private List<Integer> courseOrder;   //TODO: sure list is an object?
+    private ArrayList<Integer> courseOrder;   //TODO: sure list is an object?
 
 
     //to prevent user from creating new Database
-    private Database() {
+    private Database(String pathCourses, ReadWriteLock readWriteLockCourses, ReadWriteLock readWriteLockUsers) {
         // TODO: implement - make sure threadSafe singelton?
         pathCourses = this.pathCourses;
         coursesDB = new ConcurrentHashMap<Integer, Course>();
-        usersDB = new ConcurrentHashMap<Integer, User>();
-        readWriteLockCourses = new readWriteLockCourses;
-        readWriteLockUsers = new readWriteLockUsers;
-        courseOrder = new List<Integer>; //TODO: initialize 0 or 1?
+        usersDB = new ConcurrentHashMap<String, User>();
+        readWriteLockCourses = this.readWriteLockCourses;
+        readWriteLockUsers = this.readWriteLockUsers;
+        courseOrder = new ArrayList<Integer>(); //TODO: initialize 0 or 1?
 
     }
-
 
     /**
      * Retrieves the single instance of this class.
      */
-    public static Database getInstance() {
-        return singleton;
+    public static Database getInstance() { // singleton instance checker
+        return SingletonHolder.instance;
     }
 
+    //makes Course Object from string line.
     private Course strToCourse(String line) {
         int courseNum;
         String courseName;
-        List<Integer> kdamCoursesList;
+        String kdamCoursesString;
+        ArrayList<String> kdamCoursesList;
+        ArrayList<Integer> kdamCoursesListInt;
         int numOfMaxStudents;
+        //course number
         int pointer1 = line.indexOf('|');
-        courseNum = line.substring(0, pointer1).intValue();
+        courseNum = Integer.parseInt(line.substring(0, pointer1)); //int value of string
         line = line.substring(pointer1);
+        //course name
         int pointer2 = line.indexOf('|');
         courseName = line.substring(0, pointer2);
         line = line.substring(pointer2);
+        //kdam courses list
         int pointer3 = line.indexOf('|');
-        kdamCoursesList = line.substring(0, pointer3); // need to change format to list
+        kdamCoursesString = line.substring(1, pointer3);
+        kdamCoursesList = new ArrayList<String>(Arrays.asList(kdamCoursesString.split(",")));
+        kdamCoursesListInt = new ArrayList<>(kdamCoursesList.size());
+        for (int i = 0; i < kdamCoursesListInt.size(); i++) {
+            kdamCoursesListInt.set(i, Integer.parseInt(kdamCoursesList.get(i)));
+        }
         line = line.substring(pointer3);
-        numOfMaxStudents = line.intValue();
-        return new Course(courseNum, courseName, kdamCoursesList, numOfMaxStudents);
+        //number of students
+        numOfMaxStudents = Integer.parseInt(line);
+        return new Course(courseNum, courseName, kdamCoursesList, numOfMaxStudents); //course class to be implemented
     }
 
     /**
      * loades the courses from the file path specified
      * into the Database, returns true if successful.
      */
-    boolean initialize(String coursesFilePath) {
+    boolean initialize(String coursesFilePath) throws IOException, InterruptedException {
         // TODO: implement
         Integer courseNum;
         Course course;
         String clone;
         BufferedReader reader;
         try {
-            reader = new BufferedReader(new FileReader(coursesFilePath));
-            String line = reader.readLine();
+            reader = new BufferedReader(new FileReader(coursesFilePath)); //create new buffer reader
+            String line = reader.readLine(); // reads the first line of the txt file
             while (line != null) {
-                course = strToCourse(line);
+                course = strToCourse(line); // makes a course object out of the line
                 int pointer = line.indexOf('|');
-                courseNum = line.substring(0, pointer);
+                courseNum = Integer.parseInt(line.substring(0, pointer)); // put the new course in the hash map
                 courseOrder.add(courseNum);
                 coursesDB.putIfAbsent(courseNum, course);
                 // read next line
@@ -75,8 +96,8 @@ public class Database {
             }
             reader.close();
             return true;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException e) { //TODO: ask what should be here
+            e.wait();
             return false;
         }
     }
@@ -109,6 +130,7 @@ public class Database {
     public String getKdamForCourse(int courseNumber) throws NoSuchElementException {
         return null;
     }//TODO:implement
+
     public String getMyCourses(String userName) throws NoSuchElementException {
         return null;
     }//TODO:implement
@@ -116,6 +138,7 @@ public class Database {
     public boolean isRegisteredForCourse(String userName, int courseNumber) throws NoSuchElementException {
         return true;
     }//TODO:implement
+
     public String getCourseStat(int courseNumber) throws NoSuchElementException {
         return null;
     }//TODO:implement
