@@ -5,6 +5,8 @@ import bgu.spl.net.impl.BGRSServer.DB.Database;
 import bgu.spl.net.impl.BGRSServer.SystemCommands.*;
 import bgu.spl.net.impl.BGRSServer.SystemCommands.SingleCommands.*;
 
+import java.util.NoSuchElementException;
+
 public class CRSMessagingProtocol implements MessagingProtocol<Commands> {
     private boolean shouldTerminate = false;
     private String userName = null;
@@ -65,7 +67,12 @@ public class CRSMessagingProtocol implements MessagingProtocol<Commands> {
      * @return false if there is the user isn't allowed to use the Command, or else if he is
      */
     private boolean userTypeVerify(Commands op) {
-        boolean isAdmin = Database.getInstance().isAdmin(userName);
+        boolean isAdmin;
+        try {
+            isAdmin=Database.getInstance().isAdmin(userName);
+        } catch (NoSuchElementException e) {
+            return false;
+        }
         boolean isAdminCommand = AdminCommand.class.isInstance(op);
         if ((!isAdmin & isAdminCommand) | (isAdmin & !isAdminCommand)) {
             return false;

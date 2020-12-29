@@ -118,13 +118,31 @@ public class Database {
     }
 
     //DB functions:
-    public boolean isAdmin(String userName) {//TODO:implement
+    public boolean isUser(String userName) {
+        return usersDB.containsKey(userName);
+    }
+    public boolean isCourse(int course) {
+        return coursesDB.containsKey(course);
+    }
+    public boolean isAdmin(String userName) throws NoSuchElementException {
+        if (!isUser(userName)) throw new NoSuchElementException("no such userName");
         return usersDB.get(userName).isAdmin();
-    } //TODO:imlement
+    }
 
+    /**
+     * Try to register a new user if possible.
+     * If already exist - return false;
+     * else, create a new User entity and add to the userDb.
+     *
+     * @param userName
+     * @param password
+     * @param isAdmin
+     * @return
+     */
     public boolean registerNewUser(String userName, String password, boolean isAdmin) {
-        User userToRegister = new User(userName, password);
-        usersDB.putIfAbsent(userName, userToRegister);
+        if (isUser(userName)) return false;
+        User userToRegister = new User(userName, password,isAdmin);
+        usersDB.put(userName, userToRegister);
         return true;
     }//TODO:implement
 
@@ -136,24 +154,56 @@ public class Database {
         return true;
     }//TODO:implement
 
+    /**
+     * Log in the user if possible and return the result:
+     *
+     * if @userName doesn't exists, password isn't correct or is already logged in - return false;
+     * else - true
+     * @param userName
+     * @param password
+     * @return
+     */
     public boolean logInUser(String userName, String password) {
-        return true;
-    }//TODO:imlement
+        if (!isUser(userName)) return false;
+        User user1 = usersDB.get(userName);
+        if ((user1.getPass().equals(password)) && (!user1.isLoggedIn())) {
+            user1.setLoggedIn(true);
+            return true;
+        }
+        return false;
+    }
 
+    /**
+     * Log in the user if possible and return the result:
+     *
+     * if @userName doesn't exists, or is not logged in - return false;
+     * else - true
+     * @param userName
+     * @return
+     */
     public boolean logOutUser(String userName) { //TODO:imlement
-        return true;
+        if (!isUser(userName)) return false;
+        User user1 = usersDB.get(userName);
+        if (user1.isLoggedIn()) {
+            user1.setLoggedIn(false);
+            return true;
+        }
+        return false;
     }
 
     public String getKdamForCourse(int courseNumber) throws NoSuchElementException {
-        return null;
+       if(!isCourse(courseNumber)) throw new NoSuchElementException("No such Course");
+       return coursesDB.get(courseNumber).getKdamCoursesList().toString(); //TODO:make sure good toString;
     }//TODO:implement
 
     public String getMyCourses(String userName) throws NoSuchElementException {
-        return null;
+        if(!isUser(userName)) throw new NoSuchElementException("No such Course");
+        return usersDB.get(userName).getListOfCoursesAttendTo().toString(); //TODO:make sure good toString
     }//TODO:implement
 
     public boolean isRegisteredForCourse(String userName, int courseNumber) throws NoSuchElementException {
-        return true;
+        if(!isUser(userName)|(!isCourse(courseNumber))) throw new NoSuchElementException("No such Course/User");
+       return usersDB.get(userName).isAttending(courseNumber);
     }//TODO:implement
 
     public String getCourseStat(int courseNumber) throws NoSuchElementException {

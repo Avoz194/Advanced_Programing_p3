@@ -9,10 +9,10 @@ public class User {
     private boolean isLoggedIn;
     private ArrayList<Integer> listOfCoursesAttendTo;
 
-    public User(String userName, String pass) {
+    public User(String userName, String pass,boolean isAdmin) {
         this.userName = userName;
         this.pass = pass;
-        this.isAdmin = false; // initializing user as not admin
+        this.isAdmin = isAdmin;
         this.isLoggedIn = false; //user must logged in to flag true in logged in 
         listOfCoursesAttendTo = new ArrayList<Integer>(); // initializing new courses per students collection 
     }
@@ -21,29 +21,19 @@ public class User {
         return userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
     public String getPass() {
         return pass;
-    }
-
-    public void setPass(String pass) {
-        this.pass = pass;
     }
 
     public boolean isAdmin() {
         return isAdmin;
     }
 
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
-    }
-
     public boolean isLoggedIn() {
         return isLoggedIn;
     }
+
+    public boolean isAttending(int course){return false;}//TODO:complete based on datastructure
 
     public void setLoggedIn(boolean loggedIn) {
         isLoggedIn = loggedIn;
