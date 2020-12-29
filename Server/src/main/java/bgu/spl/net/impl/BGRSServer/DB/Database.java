@@ -125,7 +125,8 @@ public class Database {
     } //TODO:imlement
 
     public boolean registerNewUser(String userName, String password, boolean isAdmin) {
-        User userToRe
+        User userToRegister = new User(userName, password);
+        usersDB.putIfAbsent(userName, userToRegister);
         return true;
     }//TODO:implement
 
