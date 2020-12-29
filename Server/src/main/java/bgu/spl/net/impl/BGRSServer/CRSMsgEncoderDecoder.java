@@ -2,6 +2,7 @@ package bgu.spl.net.impl.BGRSServer;
 
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.impl.BGRSServer.SystemCommands.Commands;
+import bgu.spl.net.impl.BGRSServer.SystemCommands.ServerCommand;
 import bgu.spl.net.impl.BGRSServer.SystemCommands.SingleCommands.*;
 
 import java.nio.charset.StandardCharsets;
@@ -84,60 +85,49 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
                 passWord = new String(bytes, indexOfFirstZero, len, StandardCharsets.UTF_8);
                 len = 0;
                 return new AdminReg(userName, passWord);
-            break;
             case (short) 2:
                 userName = new String(bytes, 2, indexOfFirstZero, StandardCharsets.UTF_8);
                 passWord = new String(bytes, indexOfFirstZero, len, StandardCharsets.UTF_8);
                 len = 0;
                 return new StudentReg(userName, passWord);
-            break;
             case (short) 3:
                 userName = new String(bytes, 2, indexOfFirstZero, StandardCharsets.UTF_8);
                 passWord = new String(bytes, indexOfFirstZero, len, StandardCharsets.UTF_8);
                 len = 0;
                 return new Login(userName, passWord);
-            break;
             case (short) 4:
                 return new Logout();
-            break;
             case (short) 5:
                 courseNumber = new String(bytes, 2, len, StandardCharsets.UTF_8);
                 num = Integer.parseInt(courseNumber);
-                len=0;
+                len = 0;
                 return new CourseReg(num);
-            break;
             case (short) 6:
                 courseNumber = new String(bytes, 2, len, StandardCharsets.UTF_8);
                 num = Integer.parseInt(courseNumber);
-                len=0;
+                len = 0;
                 return new KdamCheck(num);
-            break;
             case (short) 7:
                 courseNumber = new String(bytes, 2, len, StandardCharsets.UTF_8);
                 num = Integer.parseInt(courseNumber);
-                len=0;
+                len = 0;
                 return new CourseStat(num);
-            break;
             case (short) 8:
                 userName = new String(bytes, 2, indexOfFirstZero, StandardCharsets.UTF_8);
-                len=0;
+                len = 0;
                 return new StudentStat(userName);
-            break;
             case (short) 9:
                 courseNumber = new String(bytes, 2, len, StandardCharsets.UTF_8);
                 num = Integer.parseInt(courseNumber);
-                len=0;
+                len = 0;
                 return new IsRegistered(num);
-            break;
             case (short) 10:
                 courseNumber = new String(bytes, 2, len, StandardCharsets.UTF_8);
                 num = Integer.parseInt(courseNumber);
-                len=0;
+                len = 0;
                 return new UnRegister(num);
-            break;
             case (short) 11:
                 return new MyCourses();
-            break;
         }
         return new ERR(1); //TODO:what we doing if there is a problem ?
     }
@@ -151,14 +141,15 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      * @param message the message to encode
      * @return encoded command
      */
+
     public byte[] encode(Commands message) {
         short op = (short) message.getOpCode();
-        short mOp = (short) message.getMassageOpCode(); //TODO: to impl
+        short mOp = (short) message.getCommandsOpCode(); //TODO: to impl
         String str;
         byte[] bytesArrToApp = new byte[0];
         int length = 4;
         if (op == 12) {
-            str = message.getOptionalMsg(); //TODO: to impl
+            str = (ServerCommand) message.getOptionalMsg(); //TODO: to impl
             bytesArrToApp = (str + "\n").getBytes();
             length = 4 + bytesArrToApp.length;
         }
