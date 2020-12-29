@@ -20,7 +20,7 @@ public class CRSMessagingProtocol implements MessagingProtocol<Commands> {
      */
     public Commands process(Commands msg) {
         //In case the command is ACK/ERR - throw an exception - invalid use of process
-        if (ServerCommand.class.isInstance(msg)) {
+        if (!ClientCommand.class.isInstance(msg)) {
             throw new IllegalArgumentException("The server can only process Client-2-Server Commands");
         }//TODO:maybe not as an exception
         int opCode = msg.getOpCode();
@@ -28,7 +28,6 @@ public class CRSMessagingProtocol implements MessagingProtocol<Commands> {
             -If the user should be logged in to preform the command
             -If the user is not allowed to (Admin VS Student).
             -If the user is already logged in and try to log-in
-
          */
         if ((opCode > 3) & (userName == null) | ((opCode > 4) & userTypeVerify(msg)) | ((opCode == 3) & (userName != null))) {
             return new ERR(msg.getOpCode());

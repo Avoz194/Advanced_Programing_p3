@@ -9,6 +9,8 @@ public class Course {
     private String courseName;
     private ArrayList<Integer> KdamCoursesList;
     private int numOfMaxStudents;
+    private int currentNumOfStudents = 0; //TODO: make sure to update as a part of register/unRegister
+
     private HashSet<String> setOfStudents;
 
     public Course(int courseNum, String courseName, ArrayList<Integer> kdamCoursesList, int numOfMaxStudents) {
@@ -23,22 +25,14 @@ public class Course {
         return courseNum;
     }
 
-    public void setCourseNum(int courseNum) {
-        this.courseNum = courseNum;
-    }
 
     public String getCourseName() {
         return courseName;
     }
 
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
     public ArrayList<Integer> getKdamCoursesList() {
         return KdamCoursesList;
     }
-
     public void setKdamCoursesList(ArrayList<Integer> kdamCoursesList) {
         KdamCoursesList = kdamCoursesList;
     }

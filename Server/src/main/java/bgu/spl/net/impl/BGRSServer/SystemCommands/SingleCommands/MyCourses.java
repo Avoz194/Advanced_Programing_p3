@@ -8,6 +8,9 @@ import java.util.NoSuchElementException;
 
 public class MyCourses extends StudentCommand {
 
+    private static final int numOZeroDelimiter = 2;
+    private static final int lengthOfMsg = 4;
+
     public MyCourses() {
         super(11);
     }
@@ -24,5 +27,9 @@ public class MyCourses extends StudentCommand {
         ACK response = succAction();
         response.setOptionalMsg(courses);
         return response;
+    }
+    public static int getNumOZeroDelimiter(){return numOZeroDelimiter;}
+    public static int getLengthOfMsg() {
+        return lengthOfMsg;
     }
 }

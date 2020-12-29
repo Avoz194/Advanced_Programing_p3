@@ -1,7 +1,6 @@
 package bgu.spl.net.impl.BGRSServer.DB;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -29,13 +28,12 @@ public class Database {
     //to prevent user from creating new Database
     private Database(String pathCourses, ReadWriteLock readWriteLockCourses, ReadWriteLock readWriteLockUsers) {
         // TODO: implement - make sure threadSafe singelton?
-        pathCourses = this.pathCourses;
+        this.pathCourses = pathCourses;
         coursesDB = new ConcurrentHashMap<Integer, Course>();
         usersDB = new ConcurrentHashMap<String, User>();
-        readWriteLockCourses = this.readWriteLockCourses;
-        readWriteLockUsers = this.readWriteLockUsers;
-        courseOrder = new ArrayList<Integer>(); //TODO: initialize 0 or 1?
-
+        this.readWriteLockCourses = readWriteLockCourses;
+        this.readWriteLockUsers = readWriteLockUsers;
+        courseOrder = new ArrayList<Integer>();
     }
 
     /**
@@ -89,7 +87,7 @@ public class Database {
      * @throws IOException
      * @throws InterruptedException
      */
-    boolean initialize(String coursesFilePath) throws IOException, InterruptedException {
+    boolean initialize(String coursesFilePath) throws IOException {
         // TODO: implement
         Integer courseNum;
         Course course;
@@ -108,16 +106,15 @@ public class Database {
                 line = reader.readLine();
             }
             reader.close();
-            for (int courseNumber : coursesDB.keySet()) { //loop on every key on courses DB
-                ArrayList<Integer> temp = coursesDB.get(courseNumber).getKdamCoursesList();
-                temp.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o))); // reordering the kdam list to the fixed order
-                coursesDB.get(courseNumber).setKdamCoursesList(temp);
-            }
-            return true;
         } catch (IOException e) { //TODO: ask what should be here
-            e.wait();
             return false;
         }
+        for (int courseNumber : coursesDB.keySet()) { //loop on every key on courses DB
+            ArrayList<Integer> temp = coursesDB.get(courseNumber).getKdamCoursesList();
+            temp.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o))); // reordering the kdam list to the fixed order
+            coursesDB.get(courseNumber).setKdamCoursesList(temp);
+        }
+        return true;
     }
 
     //DB functions:

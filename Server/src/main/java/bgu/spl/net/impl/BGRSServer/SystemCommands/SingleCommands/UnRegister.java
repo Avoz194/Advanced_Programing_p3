@@ -6,6 +6,10 @@ import bgu.spl.net.impl.BGRSServer.SystemCommands.StudentCommand;
 
 public class UnRegister extends StudentCommand {
     private int courseNumber;
+
+    private static final int numOZeroDelimiter = 2;
+    private static final int lengthOfMsg = 4;
+
     public UnRegister(int courseNumber) {
         super(10);
         this.courseNumber=courseNumber;
@@ -17,5 +21,9 @@ public class UnRegister extends StudentCommand {
         boolean result = db.unRegisterFromCourse(userName,courseNumber);
         if (result) return succAction();
         else return error();
+    }
+    public static int getNumOZeroDelimiter(){return numOZeroDelimiter;}
+    public static int getLengthOfMsg() {
+        return lengthOfMsg;
     }
 }

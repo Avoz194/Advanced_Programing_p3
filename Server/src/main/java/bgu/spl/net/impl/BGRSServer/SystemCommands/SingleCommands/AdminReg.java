@@ -6,6 +6,8 @@ import bgu.spl.net.impl.BGRSServer.SystemCommands.ServerCommand;
 
 public class AdminReg extends AdminCommand {
     String password;
+    private static final int numOZeroDelimiter = 2;
+    private static final int lengthOfMsg = 4;
 
     public AdminReg(String user, String pass) {
         super(1);
@@ -19,5 +21,9 @@ public class AdminReg extends AdminCommand {
         boolean result = db.registerNewUser(userName, password,true);
         if (result) return succAction();
         else return error();
+    }
+    public static int getNumOZeroDelimiter(){return numOZeroDelimiter;}
+    public static int getLengthOfMsg() {
+        return lengthOfMsg;
     }
 }

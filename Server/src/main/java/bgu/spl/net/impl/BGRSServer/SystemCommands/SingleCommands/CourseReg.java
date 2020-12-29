@@ -6,6 +6,8 @@ import bgu.spl.net.impl.BGRSServer.SystemCommands.StudentCommand;
 
 public class CourseReg extends StudentCommand {
     private int courseNumber;
+    private static final int numOZeroDelimiter = 2;
+    private static final int lengthOfMsg = 4;
     public CourseReg(int courseNumber) {
         super(5);
         this.courseNumber=courseNumber;
@@ -17,5 +19,9 @@ public class CourseReg extends StudentCommand {
         boolean result = db.registerToCourse(userName,courseNumber);
         if (result) return succAction();
         else return error();
+    }
+    public static int getNumOZeroDelimiter(){return numOZeroDelimiter;}
+    public static int getLengthOfMsg() {
+        return lengthOfMsg;
     }
 }
