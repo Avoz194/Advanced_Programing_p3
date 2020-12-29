@@ -1,6 +1,7 @@
 package bgu.spl.net.impl.BGRSServer.DB;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Course {
     //courseNum|courseName|KdamCoursesList|numOfMaxStudents
@@ -8,12 +9,14 @@ public class Course {
     private String courseName;
     private ArrayList<Integer> KdamCoursesList;
     private int numOfMaxStudents;
+    private HashSet<String> setOfStudents;
 
     public Course(int courseNum, String courseName, ArrayList<Integer> kdamCoursesList, int numOfMaxStudents) {
         this.courseNum = courseNum;
         this.courseName = courseName;
         this.KdamCoursesList = kdamCoursesList;
         this.numOfMaxStudents = numOfMaxStudents;
+        this.setOfStudents = new HashSet<String>();
     }
 
     public int getCourseNum() {
@@ -46,5 +49,13 @@ public class Course {
 
     public void setNumOfMaxStudents(int numOfMaxStudents) {
         this.numOfMaxStudents = numOfMaxStudents;
+    }
+
+    public HashSet<String> getSetOfStudents() {
+        return setOfStudents;
+    }
+
+    public void setSetOfStudents(HashSet<String> setOfStudents) {
+        this.setOfStudents = setOfStudents;
     }
 }
