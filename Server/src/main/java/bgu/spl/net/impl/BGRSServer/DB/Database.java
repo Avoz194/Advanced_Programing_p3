@@ -97,8 +97,9 @@ public class Database {
         try {
             reader = new BufferedReader(new FileReader(coursesFilePath)); //create new buffer reader
             String line = reader.readLine(); // reads the first line of the txt file
-            while (line != null) {
-                course = strToCourse(line); // makes a course object out of the line
+            while (line != null) { //loop stops when there are no left lines
+                String lineClone = line;
+                course = strToCourse(lineClone); // makes a course object out of the line
                 int pointer = line.indexOf('|');
                 courseNum = Integer.parseInt(line.substring(0, pointer)); // put the new course in the hash map
                 courseOrder.add(courseNum);
