@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 
@@ -23,6 +21,11 @@ public class Database {
     private ArrayList<Integer> courseOrder;   //TODO: sure list is an object?
 
 
+    /**
+     * @param pathCourses
+     * @param readWriteLockCourses
+     * @param readWriteLockUsers
+     */
     //to prevent user from creating new Database
     private Database(String pathCourses, ReadWriteLock readWriteLockCourses, ReadWriteLock readWriteLockUsers) {
         // TODO: implement - make sure threadSafe singelton?
@@ -42,7 +45,12 @@ public class Database {
         return SingletonHolder.instance;
     }
 
-    //makes Course Object from string line.
+    /**
+     * makes Course Object from string line.
+     *
+     * @param line
+     * @return course object
+     */
     private Course strToCourse(String line) {
         int courseNum;
         String courseName;
@@ -69,18 +77,22 @@ public class Database {
         line = line.substring(pointer3);
         //number of students
         numOfMaxStudents = Integer.parseInt(line);
-        return new Course(courseNum, courseName, kdamCoursesList, numOfMaxStudents); //course class to be implemented
+        return new Course(courseNum, courseName, kdamCoursesListInt, numOfMaxStudents); //course class to be implemented
     }
 
     /**
-     * loades the courses from the file path specified
+     * loades the courses from the file path {@code coursesFilePath }specified
      * into the Database, returns true if successful.
+     *
+     * @param coursesFilePath
+     * @return true if succeed anf false if not
+     * @throws IOException
+     * @throws InterruptedException
      */
     boolean initialize(String coursesFilePath) throws IOException, InterruptedException {
         // TODO: implement
         Integer courseNum;
         Course course;
-        String clone;
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(coursesFilePath)); //create new buffer reader
@@ -95,6 +107,11 @@ public class Database {
                 line = reader.readLine();
             }
             reader.close();
+            for (int courseNumber : coursesDB.keySet()) { //loop on every key on courses DB
+                ArrayList<Integer> temp = coursesDB.get(courseNumber).getKdamCoursesList();
+                temp.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o))); // reordering the kdam list to the fixed order
+                coursesDB.get(courseNumber).setKdamCoursesList(temp);
+            }
             return true;
         } catch (IOException e) { //TODO: ask what should be here
             e.wait();
@@ -104,10 +121,11 @@ public class Database {
 
     //DB functions:
     public boolean isAdmin(String userName) {//TODO:implement
-        return true;
+        return usersDB.get(userName).isAdmin();
     } //TODO:imlement
 
     public boolean registerNewUser(String userName, String password, boolean isAdmin) {
+        User userToRe
         return true;
     }//TODO:implement
 
