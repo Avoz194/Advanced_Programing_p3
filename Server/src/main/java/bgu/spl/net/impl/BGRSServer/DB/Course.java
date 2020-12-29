@@ -10,10 +10,10 @@ public class Course {
     private int numOfMaxStudents;
 
     public Course(int courseNum, String courseName, ArrayList<Integer> kdamCoursesList, int numOfMaxStudents) {
-        courseNum = this.courseNum;
-        courseName = this.courseName;
-        kdamCoursesList = this.KdamCoursesList;
-        numOfMaxStudents = this.numOfMaxStudents;
+        this.courseNum = courseNum;
+        this.courseName = courseName;
+        this.KdamCoursesList = kdamCoursesList;
+        this.numOfMaxStudents = numOfMaxStudents;
     }
 
     public int getCourseNum() {
