@@ -87,8 +87,8 @@ public class Database {
      * @throws IOException
      * @throws InterruptedException
      */
-    boolean initialize(String coursesFilePath) throws IOException {
-        // TODO: implement
+    public boolean initialize(String coursesFilePath) {
+        // TODO: add exception if already initialized
         Integer courseNum;
         Course course;
         BufferedReader reader;
