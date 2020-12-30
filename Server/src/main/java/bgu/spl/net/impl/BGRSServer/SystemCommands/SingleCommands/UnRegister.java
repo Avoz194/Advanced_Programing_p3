@@ -7,8 +7,7 @@ import bgu.spl.net.impl.BGRSServer.SystemCommands.StudentCommand;
 public class UnRegister extends StudentCommand {
     private int courseNumber;
 
-    private static final int numOZeroDelimiter = 2;
-    private static final int lengthOfMsg = 4;
+    
 
     public UnRegister(int courseNumber) {
         super(10);
@@ -22,8 +21,5 @@ public class UnRegister extends StudentCommand {
         if (result) return succAction();
         else return error();
     }
-    public static int getNumOZeroDelimiter(){return numOZeroDelimiter;}
-    public static int getLengthOfMsg() {
-        return lengthOfMsg;
-    }
+  
 }
