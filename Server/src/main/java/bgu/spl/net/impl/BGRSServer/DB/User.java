@@ -7,9 +7,9 @@ public class User {
     private String pass;
     private boolean isAdmin;
     private boolean isLoggedIn;
-    private ArrayList<Integer> listOfCoursesAttendTo; //TODO:consider different Datastucture
+    private ArrayList<Integer> listOfCoursesAttendTo; //TODO:consider different DataStructure
 
-    public User(String userName, String pass,boolean isAdmin) {
+    public User(String userName, String pass, boolean isAdmin) {
         this.userName = userName;
         this.pass = pass;
         this.isAdmin = isAdmin;
@@ -33,10 +33,33 @@ public class User {
         return isLoggedIn;
     }
 
-    public boolean isAttending(int course){return false;}//TODO:complete based on datastructure
+    /**
+     * Make sure the user is attending @course, search for the entity in the @listOfCoursesAttendTo
+     * @param course
+     * @return
+     */
+    public boolean isAttending(int course) {
+        return listOfCoursesAttendTo.contains(course);
+    }
 
-    public void registerToCourse(int course){} //TODO:complete
-    public void unregisterFromCourse(int course){}//TODO:complete
+    /**
+     * Assuming the user isn't registered for the course, register him.
+     *
+     * @param course
+     */
+    public void registerToCourse(int course) {
+       listOfCoursesAttendTo.add(course);
+    }
+
+    /**
+     * Assuming the user is registered for the course, unregister him.
+     *
+     * @param course
+     */
+    public void unregisterFromCourse(int course) {
+        listOfCoursesAttendTo.remove(course);
+    }
+
     public void setLoggedIn(boolean loggedIn) {
         isLoggedIn = loggedIn;
     }

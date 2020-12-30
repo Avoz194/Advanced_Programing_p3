@@ -46,15 +46,29 @@ public class Course {
         return listOfStudents;
     }
 
-    public boolean addStudent(String studentName) { //TODO:complete
+    /**
+     * Add a student to the course if there is an empty seat and he wasn't registered to this course before.
+     * @param studentName
+     * @return
+     */
+    public boolean addStudent(String studentName) {
         //Make sure there is place in the course (return false if not)
-        //Add student
-        //increase currentNum
-        return false;
+        if((numOfAvailableSeats==0)|listOfStudents.contains(studentName)) return false;
+        numOfAvailableSeats=numOfAvailableSeats-1;
+        listOfStudents.add(studentName);
+        return true;
     }
 
-    public void removeStudent(String studentName) { //TODO:complete
-
+    /**
+     * Remove a student from the course. make sure to increase the amount of empty seats.
+     * Asuming the user is already registered.
+     *
+     * @param studentName
+     * @return
+     */
+    public void removeStudent(String studentName) {
+        listOfStudents.remove(studentName);
+        numOfAvailableSeats=numOfAvailableSeats+1;
     }
 
 }
