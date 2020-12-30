@@ -3,12 +3,8 @@ package bgu.spl.net.impl.BGRSServer.DB;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.NoSuchElementException;
 import java.util.concurrent.locks.ReadWriteLock;
 
 public class Database {
@@ -60,10 +56,10 @@ public class Database {
         //kdam courses list
         int pointer3 = line.indexOf('|');
         String kdamCoursesString = line.substring(1, pointer3-1);
-        ArrayList<String> kdamCoursesList = new ArrayList<String>(Arrays.asList(kdamCoursesString.split(",")));
-        ArrayList<Integer> kdamCoursesListInt = new ArrayList<>(kdamCoursesList.size());
-        for (int i = 0; i < kdamCoursesListInt.size(); i++) {
-            kdamCoursesListInt.set(i, Integer.parseInt(kdamCoursesList.get(i))); //TODO:maybe go one by one with for:each instead of using unefficient Get?
+        ArrayList<String> kdamCoursesList = new ArrayList(Arrays.asList(kdamCoursesString.split(",")));
+        ArrayList<Integer> kdamCoursesListInt = new ArrayList();
+        for (String s:kdamCoursesList) {
+            kdamCoursesListInt.add(Integer.parseInt(s));
         }
         line = line.substring(pointer3);
         //number of students
@@ -78,19 +74,16 @@ public class Database {
      * @param coursesFilePath
      * @return true if succeed anf false if not
      */
-    public boolean initialize(String coursesFilePath) {
-        // TODO: add exception if already initialized
-        Integer courseNum;
-        Course course;
-        BufferedReader reader;
+    public boolean initialize(String coursesFilePath){
+        if(coursesFilePath !=null) throw new RuntimeException("The Database is already initialized");
         try {
-            reader = new BufferedReader(new FileReader(coursesFilePath)); //create new buffer reader
+            BufferedReader reader = new BufferedReader(new FileReader(coursesFilePath)); //create new buffer reader
             String line = reader.readLine(); // reads the first line of the txt file
-            while (line != null) { //loop stops when there are no left lines
+            while (line != null) { //loop stops when there are no remaining lines
                 String lineClone = line;
-                course = strToCourse(lineClone); // makes a course object out of the line
+                Course course = strToCourse(lineClone); // makes a course object out of the line
                 int pointer = line.indexOf('|');
-                courseNum = Integer.parseInt(line.substring(0, pointer)); // put the new course in the hash map
+                Integer courseNum = Integer.parseInt(line.substring(0, pointer)); // put the new course in the hash map
                 courseOrder.add(courseNum);
                 coursesDB.putIfAbsent(courseNum, course);
                 // read next line
@@ -100,10 +93,10 @@ public class Database {
         } catch (IOException e) { //TODO: ask what should be here
             return false;
         }
-        for (int courseNumber : coursesDB.keySet()) { //loop on every key on courses DB
-            ArrayList<Integer> temp = coursesDB.get(courseNumber).getKdamCoursesList();
+        for (Course course : coursesDB.values()) { //loop on every value on courses DB
+            ArrayList<Integer> temp = course.getKdamCoursesList();
             temp.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o))); // reordering the kdam list to the fixed order
-            coursesDB.get(courseNumber).setKdamCoursesList(temp);
+            course.setKdamCoursesList(temp);
         }
         return true;
     }
