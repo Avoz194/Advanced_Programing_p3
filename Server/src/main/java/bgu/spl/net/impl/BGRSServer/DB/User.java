@@ -1,20 +1,20 @@
 package bgu.spl.net.impl.BGRSServer.DB;
 
-import java.util.ArrayList;
+import java.util.Vector;
 
 public class User {
     private String userName;
     private String pass;
     private boolean isAdmin;
     private boolean isLoggedIn;
-    private ArrayList<Integer> listOfCoursesAttendTo; //TODO:consider different DataStructure
+    private Vector<Integer> listOfCoursesAttendTo; //TODO:consider different DataStructure
 
     public User(String userName, String pass, boolean isAdmin) {
         this.userName = userName;
         this.pass = pass;
         this.isAdmin = isAdmin;
         this.isLoggedIn = false; //user must logged in to flag true in logged in 
-        listOfCoursesAttendTo = new ArrayList<Integer>(); // initializing new courses per students collection 
+        listOfCoursesAttendTo = new Vector<Integer>(); // initializing new courses per students collection
     }
 
     public String getUserName() {
@@ -64,7 +64,7 @@ public class User {
         isLoggedIn = loggedIn;
     }
 
-    public ArrayList<Integer> getListOfCoursesAttendTo() {
+    public Vector<Integer> getListOfCoursesAttendTo() {
         return listOfCoursesAttendTo;
     }
 

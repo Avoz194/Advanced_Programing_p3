@@ -278,7 +278,7 @@ public class Database {
      */
     public String getMyCourses(String userName) throws NoSuchElementException {
         if (!isUser(userName)) throw new NoSuchElementException("No such user");
-        ArrayList<Integer> temp = usersDB.get(userName).getListOfCoursesAttendTo();
+        Vector<Integer> temp = usersDB.get(userName).getListOfCoursesAttendTo();
         temp.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o)));
         return temp.toString(); //TODO:make sure good toString
     }
@@ -335,7 +335,7 @@ public class Database {
         st.append("Student: "+userName);
         st.append("\n");
         //Add list of the courses based on the order in courses.txt
-        ArrayList<Integer> sorted = user1.getListOfCoursesAttendTo();
+        Vector<Integer> sorted = user1.getListOfCoursesAttendTo();
         sorted.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o)));
         st.append("Courses: "+sorted.toString());
         return st.toString();
