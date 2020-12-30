@@ -8,8 +8,7 @@ import java.util.NoSuchElementException;
 
 public class KdamCheck extends StudentCommand {
     private int courseNumber;
-    private static final int numOZeroDelimiter = 2;
-    private static final int lengthOfMsg = 4;
+   
 
     public KdamCheck(int courseNumber) {
         super(6);
@@ -29,8 +28,5 @@ public class KdamCheck extends StudentCommand {
         response.setOptionalMsg(kdam);
         return response;
     }
-    public static int getNumOZeroDelimiter(){return numOZeroDelimiter;}
-    public static int getLengthOfMsg() {
-        return lengthOfMsg;
-    }
+    
 }
