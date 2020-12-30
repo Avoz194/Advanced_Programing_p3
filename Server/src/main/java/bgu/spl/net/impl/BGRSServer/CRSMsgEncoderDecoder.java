@@ -26,6 +26,11 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      */
     public Commands decodeNextByte(byte nextByte) {
         short op = 0;
+        if (len == 2) {
+            if (getOp() == ((short) 4)) {
+                return commandToBuildD(op);
+            }
+        }
         if (len >= 4) { // checker to see if there are 4 byts of data
             op = getOp();
         }
@@ -43,8 +48,10 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
             } else if (nOz == 1) {
                 return commandToBuildC(op);
             }
+        } else if (op == ((short) 12) | op == ((short) 13)) { //op 12 = ack op 13 = err
+            throw new IllegalArgumentException("the op is not valid for decoding");
         } else {
-            throw new IllegalArgumentException("the op is not valid");
+            throw new IllegalArgumentException("there was problem wuth the decoding");
         }
         pushByte(nextByte);
         return null; //not finish yet
@@ -78,8 +85,9 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
 
     /**
      * commanToBuildA : AdminReg,StudentReg,Login id: 2 zero
-     * commanToBuildB : CourseReg,KdamCheck,CourseStat,IsRegistered,UnRegister id: length = 4 byts
+     * commanToBuildB : CourseReg,KdamCheck,CourseStat,IsRegistered,UnRegister id: length = 4 byets
      * commanToBuildC : StudentStat id: 1 zero
+     * commanToBuildD : Logout,MyCourses id: length = 2 byets
      * <p>
      * this methods return a decoded command out of buffer feed of bytes
      *
@@ -131,6 +139,15 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
         userName = new String(bytes, 2, len, StandardCharsets.UTF_8);
         len = 0;
         return new StudentStat(userName);
+    }
+
+    private Commands commandToBuildD(short op) {
+        len = 0;
+        if (op == ((short) 11)) {
+            return new MyCourses();
+        } else {
+            return new Logout();
+        }
     }
 
     /**
