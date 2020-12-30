@@ -6,8 +6,7 @@ import bgu.spl.net.impl.BGRSServer.SystemCommands.ServerCommand;
 
 public class Login extends ClientCommand {
     private String password;
-    private static final int numOZeroDelimiter = 2;
-    private static final int lengthOfMsg = 4;
+   
 
     public Login(String user, String pass) {
         super(3);
@@ -22,8 +21,5 @@ public class Login extends ClientCommand {
         if (result) return succAction();
         else return error();
     }
-    public static int getNumOZeroDelimiter(){return numOZeroDelimiter;}
-    public static int getLengthOfMsg() {
-        return lengthOfMsg;
-    }
+ 
 }
