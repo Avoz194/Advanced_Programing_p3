@@ -3,17 +3,21 @@ package bgu.spl.net.impl.BGRSServer.DB;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.NoSuchElementException;
 import java.util.concurrent.locks.ReadWriteLock;
 
 public class Database {
     private static class SingletonHolder {
-        private static Database instance = new Database(getInstance().pathCourses, getInstance().readWriteLockCourses, getInstance().readWriteLockCourses);
+        private static Database instance = new Database();
     }
 
     //TODO:SYNC
-    private String pathCourses;
+    private String pathCourses =null;
     private ConcurrentHashMap<Integer, Course> coursesDB;
     private ConcurrentHashMap<String, User> usersDB;
     private ReadWriteLock readWriteLockCourses;
@@ -21,19 +25,13 @@ public class Database {
     private ArrayList<Integer> courseOrder;
 
 
-    /**
-     * @param pathCourses
-     * @param readWriteLockCourses
-     * @param readWriteLockUsers
-     */
     //to prevent user from creating new Database
-    private Database(String pathCourses, ReadWriteLock readWriteLockCourses, ReadWriteLock readWriteLockUsers) {
+    private Database() {
         // TODO: implement - make sure threadSafe singelton?
-        this.pathCourses = pathCourses;
         coursesDB = new ConcurrentHashMap<Integer, Course>();
         usersDB = new ConcurrentHashMap<String, User>();
-        this.readWriteLockCourses = readWriteLockCourses;
-        this.readWriteLockUsers = readWriteLockUsers;
+        this.readWriteLockCourses = readWriteLockUsers; //TODO:FIX
+        this.readWriteLockUsers = readWriteLockUsers; //TODO:FIX
         courseOrder = new ArrayList<Integer>();
     }
 
@@ -51,31 +49,25 @@ public class Database {
      * @return course object
      */
     private Course strToCourse(String line) {
-        int courseNum;
-        String courseName;
-        String kdamCoursesString;
-        ArrayList<String> kdamCoursesList;
-        ArrayList<Integer> kdamCoursesListInt;
-        int numOfMaxStudents;
         //course number
         int pointer1 = line.indexOf('|');
-        courseNum = Integer.parseInt(line.substring(0, pointer1)); //int value of string
+        int courseNum = Integer.parseInt(line.substring(0, pointer1)); //int value of string
         line = line.substring(pointer1);
         //course name
         int pointer2 = line.indexOf('|');
-        courseName = line.substring(0, pointer2);
+        String courseName = line.substring(0, pointer2);
         line = line.substring(pointer2);
         //kdam courses list
         int pointer3 = line.indexOf('|');
-        kdamCoursesString = line.substring(1, pointer3);
-        kdamCoursesList = new ArrayList<String>(Arrays.asList(kdamCoursesString.split(",")));
-        kdamCoursesListInt = new ArrayList<>(kdamCoursesList.size());
+        String kdamCoursesString = line.substring(1, pointer3-1);
+        ArrayList<String> kdamCoursesList = new ArrayList<String>(Arrays.asList(kdamCoursesString.split(",")));
+        ArrayList<Integer> kdamCoursesListInt = new ArrayList<>(kdamCoursesList.size());
         for (int i = 0; i < kdamCoursesListInt.size(); i++) {
-            kdamCoursesListInt.set(i, Integer.parseInt(kdamCoursesList.get(i)));
+            kdamCoursesListInt.set(i, Integer.parseInt(kdamCoursesList.get(i))); //TODO:maybe go one by one with for:each instead of using unefficient Get?
         }
         line = line.substring(pointer3);
         //number of students
-        numOfMaxStudents = Integer.parseInt(line);
+        int numOfMaxStudents = Integer.parseInt(line);
         return new Course(courseNum, courseName, kdamCoursesListInt, numOfMaxStudents); //course class to be implemented
     }
 
