@@ -2,6 +2,8 @@ package bgu.spl.net.impl.BGRSServer.DB;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Course {
     //courseNum|courseName|KdamCoursesList|numOfMaxStudents
@@ -10,7 +12,7 @@ public class Course {
     private ArrayList<Integer> KdamCoursesList;
     private int numOfMaxStudents;
     private int numOfAvailableSeats;
-    private HashSet<String> listOfStudents;
+    private Set<String> listOfStudents; //TODO: make sure ThreadSafe
 
     public Course(int courseNum, String courseName, ArrayList<Integer> kdamCoursesList, int numOfMaxStudents) {
         this.courseNum = courseNum;
@@ -18,7 +20,7 @@ public class Course {
         this.KdamCoursesList = kdamCoursesList;
         this.numOfMaxStudents = numOfMaxStudents;
         this.numOfAvailableSeats = numOfMaxStudents;
-        this.listOfStudents = new HashSet<String>();
+        this.listOfStudents = ConcurrentHashMap.newKeySet();
     }
 
 
@@ -42,7 +44,7 @@ public class Course {
         return numOfAvailableSeats;
     }
 
-    public HashSet<String> getListOfStudents() {
+    public Set<String> getListOfStudents() {
         return listOfStudents;
     }
 

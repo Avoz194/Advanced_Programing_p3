@@ -315,7 +315,7 @@ public class Database {
         st.append("Seats Available: "+course1.getNumOfAvailableSeats()+"/"+course1.getNumOfMaxStudents());
         st.append("\n");
         //Add registered students
-        st.append("Students Registered: "+course1.getListOfStudents());
+        st.append("Students Registered: "+course1.getListOfStudents().toString());
         return st.toString();
     }//TODO:implement
 
