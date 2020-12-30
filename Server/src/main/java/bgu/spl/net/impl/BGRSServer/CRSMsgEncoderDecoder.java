@@ -178,11 +178,9 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
     public byte[] encode(Commands message) {
         short op = (short) message.getOpCode();
         if (op == 12) {
-            message = (ACK) (message);
-            return message.encode();
+            return ((ACK) message).encode();
         } else {
-            message = (ERR) (message);
-            return (ERR) message.encode();
+            return ((ERR) message).encode();
         }
     }
 }
