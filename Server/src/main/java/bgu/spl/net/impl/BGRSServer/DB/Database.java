@@ -13,7 +13,7 @@ public class Database {
     }
 
     //TODO:SYNC
-    private String pathCourses =null;
+    private String pathCourses = null;
     private ConcurrentHashMap<Integer, Course> coursesDB;
     private ConcurrentHashMap<String, User> usersDB;
     private ReadWriteLock readWriteLockCourses;
@@ -55,10 +55,10 @@ public class Database {
         line = line.substring(pointer2);
         //kdam courses list
         int pointer3 = line.indexOf('|');
-        String kdamCoursesString = line.substring(1, pointer3-1);
+        String kdamCoursesString = line.substring(1, pointer3 - 1);
         ArrayList<String> kdamCoursesList = new ArrayList(Arrays.asList(kdamCoursesString.split(",")));
         ArrayList<Integer> kdamCoursesListInt = new ArrayList();
-        for (String s:kdamCoursesList) {
+        for (String s : kdamCoursesList) {
             kdamCoursesListInt.add(Integer.parseInt(s));
         }
         line = line.substring(pointer3);
@@ -74,8 +74,8 @@ public class Database {
      * @param coursesFilePath
      * @return true if succeed anf false if not
      */
-    public boolean initialize(String coursesFilePath){
-        if(coursesFilePath !=null) throw new RuntimeException("The Database is already initialized");
+    public boolean initialize(String coursesFilePath) {
+        if (coursesFilePath != null) throw new RuntimeException("The Database is already initialized");
         try {
             BufferedReader reader = new BufferedReader(new FileReader(coursesFilePath)); //create new buffer reader
             String line = reader.readLine(); // reads the first line of the txt file
@@ -105,6 +105,7 @@ public class Database {
 
     /**
      * Make sure @userName is a registered user.
+     *
      * @param userName
      * @return
      */
@@ -124,6 +125,7 @@ public class Database {
 
     /**
      * Make sure if the user is an admin or not. If doesn't exist - throw an exception.
+     *
      * @param userName
      * @return
      * @throws NoSuchElementException
@@ -138,16 +140,19 @@ public class Database {
      * If already exist - return false;
      * else, create a new User entity and add to the userDb.
      *
+     * #method is blocking on usersDB as isUser and put are separated methods.
      * @param userName
      * @param password
      * @param isAdmin
      * @return
      */
     public boolean registerNewUser(String userName, String password, boolean isAdmin) {
-        if (isUser(userName)) return false;
-        User userToRegister = new User(userName, password, isAdmin);
-        usersDB.put(userName, userToRegister);
-        return true;
+        synchronized (usersDB) {
+            if (isUser(userName)) return false;
+            User userToRegister = new User(userName, password, isAdmin);
+            usersDB.put(userName, userToRegister);
+            return true;
+        }
     }
 
 
@@ -159,11 +164,13 @@ public class Database {
      * -The user has all relevant Kdams
      * -The course still has place
      *
+     * #Note that in order to remain threadSafe, both the user and courses registration WriteLocks will be locked for the actions
      * @param userName
      * @param courseNumber
      * @return true if registered successfully.
      */
     public boolean registerToCourse(String userName, int courseNumber) {
+        boolean result=true;
         try {
             if (isRegisteredForCourse(userName, courseNumber)) return false;
         } catch (NoSuchElementException e) {
@@ -171,21 +178,32 @@ public class Database {
         }
         User user1 = usersDB.get(userName);
         Course course1 = coursesDB.get(courseNumber);
-        //Make sure the user attends all courses in the kdam list for courseNumber
         ArrayList<Integer> kdam = course1.getKdamCoursesList();
+
+        //WriteLock the user's and course's registration Lock
+        ReadWriteLock courseRegistrationLock = course1.getCourseRegistrationLock();
+        ReadWriteLock userRegistrationLock = user1.getCourseRegistrationLock();
+        courseRegistrationLock.writeLock().lock();
+        userRegistrationLock.writeLock().lock();
+
+        //Make sure the user attends all courses in the kdam list for courseNumber
         for (int i : kdam) {
-            if (!user1.isAttending(i)) return false;
+            if (!user1.isAttending(i)) result= false;
         }
         //try to addStudent to course, if doesn't have place - return false
-        if (!course1.addStudent(userName)) return false;
+        if (!course1.addStudent(userName)) result= false;
         //add the course to the coursesList for the user.
         user1.registerToCourse(courseNumber);
-        return true;
+
+        //unLock the user's and course's registration Lock
+        courseRegistrationLock.writeLock().unlock();
+        userRegistrationLock.writeLock().unlock();
+        return result;
     }
 
     /**
      * Try to unregister the user from the course. Make sure are valid entities, and the user was attending this course.
-     *
+     * #Note that in order to remain threadSafe, both the user and courses registration WriteLocks will be locked for the actions
      * @param userName
      * @param courseNumber
      * @return true if successfully done
@@ -198,14 +216,25 @@ public class Database {
         }
         User user1 = usersDB.get(userName);
         Course course1 = coursesDB.get(courseNumber);
+
+        //WriteLock the user's and course's registration Lock
+        ReadWriteLock courseRegistrationLock = course1.getCourseRegistrationLock();
+        ReadWriteLock userRegistrationLock = user1.getCourseRegistrationLock();
+        courseRegistrationLock.writeLock().lock();
+        userRegistrationLock.writeLock().lock();
+
+        //unRegister
         course1.removeStudent(userName);
         user1.unregisterFromCourse(courseNumber);
+
+        //unLock the user's and course's registration Lock
+        courseRegistrationLock.writeLock().unlock();
+        userRegistrationLock.writeLock().unlock();
         return true;
     }
 
     /**
      * Log in the user if possible and return the result:
-     * <p>
      * if @userName doesn't exists, password isn't correct or is already logged in - return false;
      * else - true
      *
@@ -216,9 +245,8 @@ public class Database {
     public boolean logInUser(String userName, String password) {
         if (!isUser(userName)) return false;
         User user1 = usersDB.get(userName);
-        if ((user1.getPass().equals(password)) && (!user1.isLoggedIn())) {
-            user1.setLoggedIn(true);
-            return true;
+        if ((user1.getPass().equals(password))) {
+            return user1.setLoggedIn(true);
         }
         return false;
     }
@@ -234,11 +262,8 @@ public class Database {
     public boolean logOutUser(String userName) {
         if (!isUser(userName)) return false;
         User user1 = usersDB.get(userName);
-        if (user1.isLoggedIn()) {
-            user1.setLoggedIn(false);
-            return true;
-        }
-        return false;
+           return user1.setLoggedIn(false);
+
     }
 
 
@@ -257,13 +282,24 @@ public class Database {
     /**
      * Return the courses the user has registered to, ordered based on the original courses.txt order.
      * Throw exception if the user doesn't exist
+     *
+     * #Note that in order to remain threadSafe, the user registration ReadLocks will be locked for the actions
      * @param userName
      * @return
      * @throws NoSuchElementException
      */
     public String getMyCourses(String userName) throws NoSuchElementException {
         if (!isUser(userName)) throw new NoSuchElementException("No such user");
-        Vector<Integer> temp = usersDB.get(userName).getListOfCoursesAttendTo();
+        User user1 = usersDB.get(userName);
+
+        //ReadLock the user's registration Lock
+        ReadWriteLock courseRegistrationLock = user1.getCourseRegistrationLock();
+        courseRegistrationLock.readLock().lock();
+        Vector<Integer> temp = user1.getListOfCoursesAttendTo();
+
+        //unLock the user's and course's registration Lock
+        courseRegistrationLock.readLock().unlock();
+
         temp.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o)));
         return temp.toString(); //TODO:make sure good toString
     }
@@ -271,6 +307,7 @@ public class Database {
     /**
      * Make sure the user is registered to this course. Throw exception in case the user/course doesn't exists.
      *
+     * #Note that in order to remain threadSafe, the user registration ReadLocks will be locked for the actions
      * @param userName
      * @param courseNumber
      * @return
@@ -278,13 +315,24 @@ public class Database {
      */
     public boolean isRegisteredForCourse(String userName, int courseNumber) throws NoSuchElementException {
         if (!isUser(userName) | (!isCourse(courseNumber))) throw new NoSuchElementException("No such Course/User");
-        return usersDB.get(userName).isAttending(courseNumber);
+        User user1 = usersDB.get(userName);
+
+        //ReadLock the user's registration Lock
+        ReadWriteLock courseRegistrationLock = user1.getCourseRegistrationLock();
+        courseRegistrationLock.readLock().lock();
+        boolean result = user1.isAttending(courseNumber);
+
+        //unLock the user's and course's registration Lock
+        courseRegistrationLock.readLock().unlock();
+
+        return result;
     }
 
     /**
      * Return the CourseStats - number, name, available seats and registered students.
      * Throw an exception if there is no such course.
      *
+     * #Note that in order to remain threadSafe, the course's registration ReadLocks will be locked for the actions
      * @param courseNumber
      * @return
      * @throws NoSuchElementException
@@ -294,13 +342,16 @@ public class Database {
         Course course1 = coursesDB.get(courseNumber);
         StringBuilder st = new StringBuilder();
         //Add course's name
-        st.append("Course: ("+courseNumber+") "+course1.getCourseName());
+        st.append("Course: (" + courseNumber + ") " + course1.getCourseName());
         st.append("\n");
         //Add Seats Available
-        st.append("Seats Available: "+course1.getNumOfAvailableSeats()+"/"+course1.getNumOfMaxStudents());
+        ReadWriteLock courseRegistrationLock = course1.getCourseRegistrationLock();
+        courseRegistrationLock.readLock().lock();
+        st.append("Seats Available: " + course1.getNumOfAvailableSeats() + "/" + course1.getNumOfMaxStudents());
         st.append("\n");
         //Add registered students
-        st.append("Students Registered: "+course1.getListOfStudents().toString());
+        st.append("Students Registered: " + course1.getListOfStudents().toString());
+        courseRegistrationLock.readLock().unlock();
         return st.toString();
     }//TODO:implement
 
@@ -308,6 +359,7 @@ public class Database {
      * Return the StudentStats - Name and courses he's registered too based on the order in courses.txt
      * Throw an exception if the userName isn't registered.
      *
+     * #Note that in order to remain threadSafe, the user registration ReadLocks will be locked for the actions
      * @param userName
      * @return
      * @throws NoSuchElementException
@@ -317,12 +369,15 @@ public class Database {
         User user1 = usersDB.get(userName);
         StringBuilder st = new StringBuilder();
         //Add student's name
-        st.append("Student: "+userName);
+        st.append("Student: " + userName);
         st.append("\n");
         //Add list of the courses based on the order in courses.txt
+        ReadWriteLock courseRegistrationLock = user1.getCourseRegistrationLock();
+        courseRegistrationLock.readLock().lock();
         Vector<Integer> sorted = user1.getListOfCoursesAttendTo();
+        courseRegistrationLock.readLock().unlock();
         sorted.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o)));
-        st.append("Courses: "+sorted.toString());
+        st.append("Courses: " + sorted.toString());
         return st.toString();
     }
 }

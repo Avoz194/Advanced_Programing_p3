@@ -1,20 +1,25 @@
 package bgu.spl.net.impl.BGRSServer.DB;
 
 import java.util.Vector;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class User {
     private String userName;
     private String pass;
     private boolean isAdmin;
     private boolean isLoggedIn;
+    private Object isloggedInLock = new Object();
     private Vector<Integer> listOfCoursesAttendTo; //TODO:consider different DataStructure
+    private ReadWriteLock courseRegistrationLock;
 
     public User(String userName, String pass, boolean isAdmin) {
         this.userName = userName;
         this.pass = pass;
         this.isAdmin = isAdmin;
-        this.isLoggedIn = false; //user must logged in to flag true in logged in 
+        this.isLoggedIn = false; //user must logged in to flag true in logged in
         listOfCoursesAttendTo = new Vector<Integer>(); // initializing new courses per students collection
+        courseRegistrationLock = new ReentrantReadWriteLock();
     }
 
     public String getUserName() {
@@ -29,12 +34,10 @@ public class User {
         return isAdmin;
     }
 
-    public boolean isLoggedIn() {
-        return isLoggedIn;
-    }
 
     /**
      * Make sure the user is attending @course, search for the entity in the @listOfCoursesAttendTo
+     *
      * @param course
      * @return
      */
@@ -48,7 +51,7 @@ public class User {
      * @param course
      */
     public void registerToCourse(int course) {
-       listOfCoursesAttendTo.add(course);
+        listOfCoursesAttendTo.add(course);
     }
 
     /**
@@ -60,12 +63,22 @@ public class User {
         listOfCoursesAttendTo.remove(course);
     }
 
-    public void setLoggedIn(boolean loggedIn) {
-        isLoggedIn = loggedIn;
+    /**
+     * Change isLoggedIn for the user, making sure the change is valid.
+     * @param loggedIn
+     * @return true if successful or false if the change isn't valid
+     */
+    public boolean setLoggedIn(boolean loggedIn) {
+        synchronized (isloggedInLock) {
+            if((isLoggedIn&loggedIn)|(!isLoggedIn&!loggedIn)) return false;
+            isLoggedIn = loggedIn;
+            return true;
+        }
     }
 
     public Vector<Integer> getListOfCoursesAttendTo() {
         return listOfCoursesAttendTo;
     }
+    public ReadWriteLock getCourseRegistrationLock(){return courseRegistrationLock;}
 
 }

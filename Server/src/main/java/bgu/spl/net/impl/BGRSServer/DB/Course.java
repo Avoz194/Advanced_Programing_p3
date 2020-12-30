@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Course {
     //courseNum|courseName|KdamCoursesList|numOfMaxStudents
@@ -13,6 +15,8 @@ public class Course {
     private int numOfMaxStudents;
     private int numOfAvailableSeats;
     private Set<String> listOfStudents; //TODO: make sure ThreadSafe
+    private ReadWriteLock courseRegistrationLock;
+
 
     public Course(int courseNum, String courseName, ArrayList<Integer> kdamCoursesList, int numOfMaxStudents) {
         this.courseNum = courseNum;
@@ -21,6 +25,7 @@ public class Course {
         this.numOfMaxStudents = numOfMaxStudents;
         this.numOfAvailableSeats = numOfMaxStudents;
         this.listOfStudents = ConcurrentHashMap.newKeySet();
+        courseRegistrationLock = new ReentrantReadWriteLock();
     }
 
 
@@ -72,5 +77,6 @@ public class Course {
         listOfStudents.remove(studentName);
         numOfAvailableSeats=numOfAvailableSeats+1;
     }
+    public ReadWriteLock getCourseRegistrationLock(){return courseRegistrationLock;}
 
 }
