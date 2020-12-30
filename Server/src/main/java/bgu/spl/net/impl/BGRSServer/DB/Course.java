@@ -9,20 +9,16 @@ public class Course {
     private String courseName;
     private ArrayList<Integer> KdamCoursesList;
     private int numOfMaxStudents;
-    private int currentNumOfStudents = 0; //TODO: make sure to update as a part of register/unRegister
-
-    private HashSet<String> setOfStudents;
+    private int numOfAvailableSeats;
+    private HashSet<String> listOfStudents;
 
     public Course(int courseNum, String courseName, ArrayList<Integer> kdamCoursesList, int numOfMaxStudents) {
         this.courseNum = courseNum;
         this.courseName = courseName;
         this.KdamCoursesList = kdamCoursesList;
         this.numOfMaxStudents = numOfMaxStudents;
-        this.setOfStudents = new HashSet<String>();
-    }
-
-    public int getCourseNum() {
-        return courseNum;
+        this.numOfAvailableSeats = numOfMaxStudents;
+        this.listOfStudents = new HashSet<String>();
     }
 
 
@@ -33,6 +29,7 @@ public class Course {
     public ArrayList<Integer> getKdamCoursesList() {
         return KdamCoursesList;
     }
+
     public void setKdamCoursesList(ArrayList<Integer> kdamCoursesList) {
         KdamCoursesList = kdamCoursesList;
     }
@@ -41,15 +38,23 @@ public class Course {
         return numOfMaxStudents;
     }
 
-    public void setNumOfMaxStudents(int numOfMaxStudents) {
-        this.numOfMaxStudents = numOfMaxStudents;
+    public int getNumOfAvailableSeats() {
+        return numOfAvailableSeats;
     }
 
-    public HashSet<String> getSetOfStudents() {
-        return setOfStudents;
+    public HashSet<String> getListOfStudents() {
+        return listOfStudents;
     }
 
-    public void setSetOfStudents(HashSet<String> setOfStudents) {
-        this.setOfStudents = setOfStudents;
+    public boolean addStudent(String studentName) { //TODO:complete
+        //Make sure there is place in the course (return false if not)
+        //Add student
+        //increase currentNum
+        return false;
     }
+
+    public void removeStudent(String studentName) { //TODO:complete
+
+    }
+
 }

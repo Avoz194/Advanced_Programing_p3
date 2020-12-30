@@ -7,7 +7,7 @@ public class User {
     private String pass;
     private boolean isAdmin;
     private boolean isLoggedIn;
-    private ArrayList<Integer> listOfCoursesAttendTo;
+    private ArrayList<Integer> listOfCoursesAttendTo; //TODO:consider different Datastucture
 
     public User(String userName, String pass,boolean isAdmin) {
         this.userName = userName;
@@ -35,6 +35,8 @@ public class User {
 
     public boolean isAttending(int course){return false;}//TODO:complete based on datastructure
 
+    public void registerToCourse(int course){} //TODO:complete
+    public void unregisterFromCourse(int course){}//TODO:complete
     public void setLoggedIn(boolean loggedIn) {
         isLoggedIn = loggedIn;
     }
@@ -43,7 +45,4 @@ public class User {
         return listOfCoursesAttendTo;
     }
 
-    public void setListOfCoursesAttendTo(ArrayList<Integer> listOfCoursesAttendTo) {
-        this.listOfCoursesAttendTo = listOfCoursesAttendTo;
-    }
 }

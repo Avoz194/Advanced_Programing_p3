@@ -117,13 +117,33 @@ public class Database {
         return true;
     }
 
-    //DB functions:
-    public boolean isUser(String userName) {
+    //DB functions for protocol's use:
+
+    /**
+     * Make sure @userName is a registered user.
+     * @param userName
+     * @return
+     */
+    private boolean isUser(String userName) {
         return usersDB.containsKey(userName);
     }
-    public boolean isCourse(int course) {
+
+    /**
+     * Make sure if @course is a valid course.
+     *
+     * @param course
+     * @return
+     */
+    private boolean isCourse(int course) {
         return coursesDB.containsKey(course);
     }
+
+    /**
+     * Make sure if the user is an admin or not. If doesn't exist - throw an exception.
+     * @param userName
+     * @return
+     * @throws NoSuchElementException
+     */
     public boolean isAdmin(String userName) throws NoSuchElementException {
         if (!isUser(userName)) throw new NoSuchElementException("no such userName");
         return usersDB.get(userName).isAdmin();
@@ -141,24 +161,70 @@ public class Database {
      */
     public boolean registerNewUser(String userName, String password, boolean isAdmin) {
         if (isUser(userName)) return false;
-        User userToRegister = new User(userName, password,isAdmin);
+        User userToRegister = new User(userName, password, isAdmin);
         usersDB.put(userName, userToRegister);
         return true;
-    }//TODO:implement
+    }
 
+
+    /**
+     * Try to register @userName to @courseNumber.
+     * Validate:
+     * -The user and the course are valid entities
+     * -The user isn't already attending this course
+     * -The user has all relevant Kdams
+     * -The course still has place
+     *
+     * @param userName
+     * @param courseNumber
+     * @return true if registered successfully.
+     */
     public boolean registerToCourse(String userName, int courseNumber) {
+        try {
+            if (isRegisteredForCourse(userName, courseNumber)) return false;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+        User user1 = usersDB.get(userName);
+        Course course1 = coursesDB.get(courseNumber);
+        //Make sure the user attends all courses in the kdam list for courseNumber
+        ArrayList<Integer> kdam = course1.getKdamCoursesList();
+        for (int i : kdam) {
+            if (!user1.isAttending(i)) return false;
+        }
+        //try to addStudent to course, if doesn't have place - return false
+        if (!course1.addStudent(userName)) return false;
+        //add the course to the coursesList for the user.
+        user1.registerToCourse(courseNumber);
         return true;
-    }//TODO:implement
+    }
 
+    /**
+     * Try to unregister the user from the course. Make sure are valid entities, and the user was attending this course.
+     *
+     * @param userName
+     * @param courseNumber
+     * @return true if successfully done
+     */
     public boolean unRegisterFromCourse(String userName, int courseNumber) {
+        try {
+            if (!isRegisteredForCourse(userName, courseNumber)) return false;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+        User user1 = usersDB.get(userName);
+        Course course1 = coursesDB.get(courseNumber);
+        course1.removeStudent(userName);
+        user1.unregisterFromCourse(courseNumber);
         return true;
-    }//TODO:implement
+    }
 
     /**
      * Log in the user if possible and return the result:
-     *
+     * <p>
      * if @userName doesn't exists, password isn't correct or is already logged in - return false;
      * else - true
+     *
      * @param userName
      * @param password
      * @return
@@ -174,14 +240,14 @@ public class Database {
     }
 
     /**
-     * Log in the user if possible and return the result:
-     *
+     * Login the user if possible and return the result:
      * if @userName doesn't exists, or is not logged in - return false;
      * else - true
+     *
      * @param userName
      * @return
      */
-    public boolean logOutUser(String userName) { //TODO:imlement
+    public boolean logOutUser(String userName) {
         if (!isUser(userName)) return false;
         User user1 = usersDB.get(userName);
         if (user1.isLoggedIn()) {
@@ -191,28 +257,88 @@ public class Database {
         return false;
     }
 
+
+    /**
+     * Return the kdam list for the course as a string. Throw exception if doesn't exist
+     *
+     * @param courseNumber
+     * @return
+     * @throws NoSuchElementException
+     */
     public String getKdamForCourse(int courseNumber) throws NoSuchElementException {
-       if(!isCourse(courseNumber)) throw new NoSuchElementException("No such Course");
-       return coursesDB.get(courseNumber).getKdamCoursesList().toString(); //TODO:make sure good toString;
+        if (!isCourse(courseNumber)) throw new NoSuchElementException("No such Course");
+        return coursesDB.get(courseNumber).getKdamCoursesList().toString(); //TODO:make sure good toString;
     }//TODO:implement
 
+    /**
+     * Return the courses the user has registered to, ordered based on the original courses.txt order.
+     * Throw exception if the user doesn't exist
+     * @param userName
+     * @return
+     * @throws NoSuchElementException
+     */
     public String getMyCourses(String userName) throws NoSuchElementException {
-        if(!isUser(userName)) throw new NoSuchElementException("No such Course");
-        return usersDB.get(userName).getListOfCoursesAttendTo().toString(); //TODO:make sure good toString
+        if (!isUser(userName)) throw new NoSuchElementException("No such user");
+        ArrayList<Integer> temp = usersDB.get(userName).getListOfCoursesAttendTo();
+        temp.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o)));
+        return temp.toString(); //TODO:make sure good toString
     }//TODO:implement
 
+    /**
+     * Make sure the user is registered to this course. Throw exception in case the user/course doesn't exists.
+     *
+     * @param userName
+     * @param courseNumber
+     * @return
+     * @throws NoSuchElementException
+     */
     public boolean isRegisteredForCourse(String userName, int courseNumber) throws NoSuchElementException {
-        if(!isUser(userName)|(!isCourse(courseNumber))) throw new NoSuchElementException("No such Course/User");
-       return usersDB.get(userName).isAttending(courseNumber);
+        if (!isUser(userName) | (!isCourse(courseNumber))) throw new NoSuchElementException("No such Course/User");
+        return usersDB.get(userName).isAttending(courseNumber);
     }//TODO:implement
 
+    /**
+     * Return the CourseStats - number, name, available seats and registered students.
+     * Throw an exception if there is no such course.
+     *
+     * @param courseNumber
+     * @return
+     * @throws NoSuchElementException
+     */
     public String getCourseStat(int courseNumber) throws NoSuchElementException {
-        return null;
+        if (!isCourse(courseNumber)) throw new NoSuchElementException("No such Course");
+        Course course1 = coursesDB.get(courseNumber);
+        StringBuilder st = new StringBuilder();
+        //Add course's name
+        st.append("Course: ("+courseNumber+") "+course1.getCourseName());
+        st.append("\n");
+        //Add Seats Available
+        st.append("Seats Available: "+course1.getNumOfAvailableSeats()+"/"+course1.getNumOfMaxStudents());
+        st.append("\n");
+        //Add registered students
+        st.append("Students Registered: "+course1.getListOfStudents());
+        return st.toString();
     }//TODO:implement
 
-    public String getStudentStat(String studentName) throws NoSuchElementException {
-        return null;
-    }//TODO:implement
-
-
+    /**
+     * Return the StudentStats - Name and courses he's registered too based on the order in courses.txt
+     * Throw an exception if the userName isn't registered.
+     *
+     * @param userName
+     * @return
+     * @throws NoSuchElementException
+     */
+    public String getStudentStat(String userName) throws NoSuchElementException {
+        if (!isUser(userName)) throw new NoSuchElementException("No such user");
+        User user1 = usersDB.get(userName);
+        StringBuilder st = new StringBuilder();
+        //Add student's name
+        st.append("Student: "+userName);
+        st.append("\n");
+        //Add list of the courses based on the order in courses.txt
+        ArrayList<Integer> sorted = user1.getListOfCoursesAttendTo();
+        sorted.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o)));
+        st.append("Courses: "+sorted.toString());
+        return st.toString();
+    }
 }
