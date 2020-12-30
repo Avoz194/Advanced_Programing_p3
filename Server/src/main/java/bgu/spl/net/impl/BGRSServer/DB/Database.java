@@ -12,12 +12,13 @@ public class Database {
         private static Database instance = new Database(getInstance().pathCourses, getInstance().readWriteLockCourses, getInstance().readWriteLockCourses);
     }
 
+    //TODO:SYNC
     private String pathCourses;
     private ConcurrentHashMap<Integer, Course> coursesDB;
     private ConcurrentHashMap<String, User> usersDB;
     private ReadWriteLock readWriteLockCourses;
     private ReadWriteLock readWriteLockUsers;
-    private ArrayList<Integer> courseOrder;   //TODO: sure list is an object?
+    private ArrayList<Integer> courseOrder;
 
 
     /**
@@ -84,8 +85,6 @@ public class Database {
      *
      * @param coursesFilePath
      * @return true if succeed anf false if not
-     * @throws IOException
-     * @throws InterruptedException
      */
     public boolean initialize(String coursesFilePath) {
         // TODO: add exception if already initialized
@@ -268,7 +267,7 @@ public class Database {
     public String getKdamForCourse(int courseNumber) throws NoSuchElementException {
         if (!isCourse(courseNumber)) throw new NoSuchElementException("No such Course");
         return coursesDB.get(courseNumber).getKdamCoursesList().toString(); //TODO:make sure good toString;
-    }//TODO:implement
+    }
 
     /**
      * Return the courses the user has registered to, ordered based on the original courses.txt order.
@@ -282,7 +281,7 @@ public class Database {
         ArrayList<Integer> temp = usersDB.get(userName).getListOfCoursesAttendTo();
         temp.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o)));
         return temp.toString(); //TODO:make sure good toString
-    }//TODO:implement
+    }
 
     /**
      * Make sure the user is registered to this course. Throw exception in case the user/course doesn't exists.
@@ -295,7 +294,7 @@ public class Database {
     public boolean isRegisteredForCourse(String userName, int courseNumber) throws NoSuchElementException {
         if (!isUser(userName) | (!isCourse(courseNumber))) throw new NoSuchElementException("No such Course/User");
         return usersDB.get(userName).isAttending(courseNumber);
-    }//TODO:implement
+    }
 
     /**
      * Return the CourseStats - number, name, available seats and registered students.
