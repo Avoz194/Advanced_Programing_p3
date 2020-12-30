@@ -75,11 +75,8 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      * @return short op out of byte
      */
     private short getOp() {
-        byte[] b = new byte[2];
-        b[0] = bytes[0];
-        b[1] = bytes[1];
-        short result = (short) ((b[0] & 0xff) << 8);
-        result += (short) (b[1] & 0xff);
+        short result = (short) ((bytes[0] & 0xff) << 8);
+        result += (short) (bytes[1] & 0xff);
         return result;
     }
 
@@ -179,8 +176,10 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
         short op = (short) message.getOpCode();
         if (op == 12) {
             return ((ACK) message).encode();
-        } else {
+        } else if (op == 13) {
             return ((ERR) message).encode();
+        } else {
+            throw new IllegalArgumentException("the system cant encode commands other than ACK & ERR");
         }
     }
 }
