@@ -6,8 +6,7 @@ import bgu.spl.net.impl.BGRSServer.SystemCommands.StudentCommand;
 
 public class StudentReg extends StudentCommand {
     private String password;
-    private static final int numOZeroDelimiter = 2;
-    private static final int lengthOfMsg = 4;
+    
 
     public StudentReg(String user, String pass) {
         super(2);
@@ -21,9 +20,5 @@ public class StudentReg extends StudentCommand {
         boolean result = db.registerNewUser(userName, password,false);
         if (result) return succAction();
         else return error();
-    }
-    public static int getNumOZeroDelimiter(){return numOZeroDelimiter;}
-    public static int getLengthOfMsg() {
-        return lengthOfMsg;
     }
 }
