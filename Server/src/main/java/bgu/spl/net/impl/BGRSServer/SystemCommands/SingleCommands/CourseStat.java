@@ -8,8 +8,6 @@ import java.util.NoSuchElementException;
 
 public class CourseStat extends AdminCommand {
     private int courseNumber;
-    private static final int numOZeroDelimiter = 2;
-    private static final int lengthOfMsg = 4;
 
     public CourseStat(int courseNumber) {
         super(7);
@@ -29,8 +27,5 @@ public class CourseStat extends AdminCommand {
         response.setOptionalMsg(courseData);
         return response;
     }
-    public static int getNumOZeroDelimiter(){return numOZeroDelimiter;}
-    public static int getLengthOfMsg() {
-        return lengthOfMsg;
-    }
+    
 }
