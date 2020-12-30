@@ -9,8 +9,7 @@ import java.util.NoSuchElementException;
 public class StudentStat extends AdminCommand {
     private String studentName;
 
-    private static final int numOZeroDelimiter = 2;
-    private static final int lengthOfMsg = 4;
+  
 
     public StudentStat(String student) {
         super(8);
@@ -30,8 +29,5 @@ public class StudentStat extends AdminCommand {
         response.setOptionalMsg(studentData);
         return response;
     }
-    public static int getNumOZeroDelimiter(){return numOZeroDelimiter;}
-    public static int getLengthOfMsg() {
-        return lengthOfMsg;
-    }
+  
 }
