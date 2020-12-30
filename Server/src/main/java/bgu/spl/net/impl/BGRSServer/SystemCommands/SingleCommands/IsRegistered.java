@@ -8,8 +8,7 @@ import java.util.NoSuchElementException;
 
 public class IsRegistered extends StudentCommand {
     private int courseNumber;
-    private static final int numOZeroDelimiter = 2;
-    private static final int lengthOfMsg = 4;
+   
 
     public IsRegistered(int courseNumber) {
         super(9);
@@ -30,8 +29,5 @@ public class IsRegistered extends StudentCommand {
         else  response.setOptionalMsg("NOT REGISTERED");
         return response;
     }
-    public static int getNumOZeroDelimiter(){return numOZeroDelimiter;}
-    public static int getLengthOfMsg() {
-        return lengthOfMsg;
-    }
+    
 }
