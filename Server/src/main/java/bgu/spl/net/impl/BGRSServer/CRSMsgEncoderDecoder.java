@@ -13,6 +13,8 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
     private int len = 0;
     private int nextZero = 0;
     private int nOz = 0;
+    private short op = 0;
+
 
     /**
      * decodeNextByte
@@ -25,33 +27,32 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      * @return a decoded command
      */
     public Commands decodeNextByte(byte nextByte) {
-        short op = 0;
+
         if (len == 2) {
-            if (getOp() == ((short) 4)) {
+            op = getOp();
+            if (op == ((short) 4)) {
                 return commandToBuildD(op);
             }
         }
         if (len >= 4) { // checker to see if there are 4 byts of data
-            op = getOp();
-        }
-        if ((op == ((short) 1) | op == ((short) 2) | op == ((short) 3))) {
-            if (nextByte == '\0' & nOz != 2) {
-                nOz++;
-            } else if (nOz == 2) {
-                return commandToBuildA(op);
+            if ((op == ((short) 1) | op == ((short) 2) | op == ((short) 3))) {
+                if (nextByte == '\0' & nOz != 2) {
+                    nOz++;
+                } else if (nOz == 2) {
+                    return commandToBuildA(op);
+                }
+            } else if (op == ((short) 5) | op == ((short) 6) | op == ((short) 7) | op == ((short) 9) | op == ((short) 10)) {
+                return commandToBuildB(op);
+            } else if (op == ((short) 8)) {
+                if (nextByte == '\0' & nOz != 1) {
+                    nOz++;
+                    return commandToBuildC();
+                }
+            } else if (op == ((short) 12) | op == ((short) 13)) { //op 12 = ack op 13 = err
+                throw new IllegalArgumentException("the op is not valid for decoding");
+            } else {
+                throw new IllegalArgumentException("there was problem with the decoding");
             }
-        } else if (op == ((short) 5) | op == ((short) 6) | op == ((short) 7) | op == ((short) 9) | op == ((short) 10)) {
-            return commandToBuildB(op);
-        } else if (op == ((short) 8)) {
-            if (nextByte == '\0' & nOz != 1) {
-                nOz++;
-            } else if (nOz == 1) {
-                return commandToBuildC(op);
-            }
-        } else if (op == ((short) 12) | op == ((short) 13)) { //op 12 = ack op 13 = err
-            throw new IllegalArgumentException("the op is not valid for decoding");
-        } else {
-            throw new IllegalArgumentException("there was problem wuth the decoding");
         }
         pushByte(nextByte);
         return null; //not finish yet
@@ -88,10 +89,10 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      * <p>
      * this methods return a decoded command out of buffer feed of bytes
      *
-     * @param op
+     * @param thisOp
      * @return a command specified by the op
      */
-    private Commands commandToBuildA(short op) {
+    private Commands commandToBuildA(short thisOp) {
         int indexOfFirstZero = 0;
         int indexOfSecondZero = 0;
         String userName = "";
@@ -101,46 +102,54 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
         indexOfSecondZero = findNextZero(nextZero);
         passWord = new String(bytes, indexOfFirstZero, indexOfSecondZero, StandardCharsets.UTF_8);
         len = 0;
-        if (op == ((short) 1)) {
-            return new AdminReg(userName, passWord);
-        } else if (op == ((short) 2)) {
-            return new StudentReg(userName, passWord);
-        } else {
-            return new Login(userName, passWord);
+        nOz = 0;
+        op = 0;
+        switch (thisOp) {
+            case ((short) 1):
+                return new AdminReg(userName, passWord);
+            case ((short) 2):
+                return new StudentReg(userName, passWord);
+            case ((short) 3):
+                return new Login(userName, passWord);
         }
-
+        throw new IllegalArgumentException("not valid return");
     }
 
-    private Commands commandToBuildB(short op) {
+    private Commands commandToBuildB(short thisOp) {
         String courseNumber;
         int num;
         courseNumber = new String(bytes, 2, 4, StandardCharsets.UTF_8);
         num = Integer.parseInt(courseNumber);
         len = 0;
         nOz = 0;
-        if (op == ((short) 5)) {
-            return new CourseReg(num);
-        } else if (op == ((short) 6)) {
-            return new KdamCheck(num);
-        } else if (op == ((short) 7)) {
-            return new CourseStat(num);
-        } else if (op == ((short) 9)) {
-            return new IsRegistered(num);
-        } else {
-            return new UnRegister(num);
+        op = 0;
+        switch (thisOp) {
+            case ((short) 5):
+                return new CourseReg(num);
+            case ((short) 6):
+                return new KdamCheck(num);
+            case ((short) 7):
+                return new CourseStat(num);
+            case ((short) 9):
+                return new IsRegistered(num);
+            case ((short) 10):
+                return new UnRegister(num);
         }
+        throw new IllegalArgumentException("not valid return ");
     }
 
-    private Commands commandToBuildC(short op) {
+    private Commands commandToBuildC() {
         String userName = "";
         userName = new String(bytes, 2, len, StandardCharsets.UTF_8);
         len = 0;
+        op = 0;
         return new StudentStat(userName);
     }
 
-    private Commands commandToBuildD(short op) {
+    private Commands commandToBuildD(short thisOp) {
         len = 0;
-        if (op == ((short) 11)) {
+        op = 0;
+        if (thisOp == ((short) 11)) {
             return new MyCourses();
         } else {
             return new Logout();
