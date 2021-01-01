@@ -12,13 +12,13 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
     private byte[] bytes = new byte[1 << 10]; //start with 1k
     private int len = 0;
     private int nextZero = 0;
-    private int nOz = 0;
+    private int numberOfZeros = 0;
     private short op = 0;
 
 
     /**
      * decodeNextByte
-     * first check if there are 4 byts in the array
+     * first check if there are 4 bytes in the array
      * get the command op
      * using the op to decode the all command base on length and number of zeros
      *
@@ -34,19 +34,20 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
                 return commandToBuildD(op);
             }
         }
-        if (len >= 4) { // checker to see if there are 4 byts of data
+        if (len >= 4) { // checker to see if there are 4 bytes of data
             if ((op == ((short) 1) | op == ((short) 2) | op == ((short) 3))) {
-                if (nextByte == '\0' & nOz != 2) {
-                    nOz++;
-                } else if (nOz == 2) {
-                    return commandToBuildA(op);
+                if (nextByte == '\0') {
+                    if (numberOfZeros == 0) { //hence first zero
+                        numberOfZeros++;
+                    } else if (numberOfZeros == 1) { //hence this is the second zero
+                        return commandToBuildA(op);
+                    }
                 }
             } else if (op == ((short) 5) | op == ((short) 6) | op == ((short) 7) | op == ((short) 9) | op == ((short) 10)) {
                 return commandToBuildB(op);
             } else if (op == ((short) 8)) {
-                if (nextByte == '\0' & nOz != 1) {
-                    nOz++;
-                    return commandToBuildC();
+                if (nextByte == '\0'){
+                     return commandToBuildC();
                 }
             } else if (op == ((short) 12) | op == ((short) 13)) { //op 12 = ack op 13 = err
                 throw new IllegalArgumentException("the op is not valid for decoding");
@@ -93,17 +94,14 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      * @return a command specified by the op
      */
     private Commands commandToBuildA(short thisOp) {
-        int indexOfFirstZero = 0;
-        int indexOfSecondZero = 0;
-        String userName = "";
-        String passWord = "";
-        indexOfFirstZero = findNextZero(nextZero);
-        userName = new String(bytes, 2, indexOfFirstZero, StandardCharsets.UTF_8);
-        indexOfSecondZero = findNextZero(nextZero);
-        passWord = new String(bytes, indexOfFirstZero, indexOfSecondZero, StandardCharsets.UTF_8);
+        int indexOfFirstZero = findNextZero(nextZero);
+        String userName = new String(bytes, 2, indexOfFirstZero, StandardCharsets.UTF_8);
+        int indexOfSecondZero = findNextZero(nextZero); //TODO:no second Zero - run till end
+        String passWord = new String(bytes, indexOfFirstZero+1, indexOfSecondZero, StandardCharsets.UTF_8);
         len = 0;
-        nOz = 0;
+        numberOfZeros = 0;
         op = 0;
+        nextZero=0;
         switch (thisOp) {
             case ((short) 1):
                 return new AdminReg(userName, passWord);
@@ -116,12 +114,10 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
     }
 
     private Commands commandToBuildB(short thisOp) {
-        String courseNumber;
-        int num;
-        courseNumber = new String(bytes, 2, 4, StandardCharsets.UTF_8);
-        num = Integer.parseInt(courseNumber);
+        String courseNumber = new String(bytes, 2, 4, StandardCharsets.UTF_8);
+        int num = Integer.parseInt(courseNumber);
         len = 0;
-        nOz = 0;
+        numberOfZeros = 0;
         op = 0;
         switch (thisOp) {
             case ((short) 5):
