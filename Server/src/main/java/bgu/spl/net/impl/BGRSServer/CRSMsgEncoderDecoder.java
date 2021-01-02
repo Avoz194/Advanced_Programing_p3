@@ -46,8 +46,8 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
             } else if (op == ((short) 5) | op == ((short) 6) | op == ((short) 7) | op == ((short) 9) | op == ((short) 10)) {
                 return commandToBuildB(op);
             } else if (op == ((short) 8)) {
-                if (nextByte == '\0'){
-                     return commandToBuildC();
+                if (nextByte == '\0') {
+                    return commandToBuildC();
                 }
             } else if (op == ((short) 12) | op == ((short) 13)) { //op 12 = ack op 13 = err
                 throw new IllegalArgumentException("the op is not valid for decoding");
@@ -97,11 +97,11 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
         int indexOfFirstZero = findNextZero(nextZero);
         String userName = new String(bytes, 2, indexOfFirstZero, StandardCharsets.UTF_8);
         int indexOfSecondZero = findNextZero(nextZero); //TODO:no second Zero - run till end
-        String passWord = new String(bytes, indexOfFirstZero+1, indexOfSecondZero, StandardCharsets.UTF_8);
+        String passWord = new String(bytes, indexOfFirstZero + 1, len, StandardCharsets.UTF_8);
         len = 0;
         numberOfZeros = 0;
         op = 0;
-        nextZero=0;
+        nextZero = 0;
         switch (thisOp) {
             case ((short) 1):
                 return new AdminReg(userName, passWord);
