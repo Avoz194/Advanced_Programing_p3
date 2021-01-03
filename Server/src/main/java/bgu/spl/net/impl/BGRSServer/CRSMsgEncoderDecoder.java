@@ -95,9 +95,9 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      */
     private Commands commandToBuildA(short thisOp) {
         int indexOfFirstZero = findNextZero(nextZero);
-        String userName = new String(bytes, 2, indexOfFirstZero, StandardCharsets.UTF_8);
+        String userName = new String(bytes, 2, indexOfFirstZero - 3, StandardCharsets.UTF_8);
         int indexOfSecondZero = findNextZero(nextZero); //TODO:no second Zero - run till end
-        String passWord = new String(bytes, indexOfFirstZero + 1, len, StandardCharsets.UTF_8);
+        String passWord = new String(bytes, indexOfFirstZero + 1, len - indexOfFirstZero, StandardCharsets.UTF_8);
         len = 0;
         numberOfZeros = 0;
         op = 0;
@@ -114,7 +114,7 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
     }
 
     private Commands commandToBuildB(short thisOp) {
-        String courseNumber = new String(bytes, 2, 4, StandardCharsets.UTF_8);
+        String courseNumber = new String(bytes, 2, len - 3, StandardCharsets.UTF_8);
         int num = Integer.parseInt(courseNumber);
         len = 0;
         numberOfZeros = 0;
@@ -136,7 +136,7 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
 
     private Commands commandToBuildC() {
         String userName = "";
-        userName = new String(bytes, 2, len, StandardCharsets.UTF_8);
+        userName = new String(bytes, 2, len - 3, StandardCharsets.UTF_8);
         len = 0;
         op = 0;
         return new StudentStat(userName);
