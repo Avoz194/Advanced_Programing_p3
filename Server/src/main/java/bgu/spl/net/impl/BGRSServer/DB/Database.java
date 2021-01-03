@@ -16,8 +16,6 @@ public class Database {
     private String pathCourses = null;
     private ConcurrentHashMap<Integer, Course> coursesDB;
     private ConcurrentHashMap<String, User> usersDB;
-    private ReadWriteLock readWriteLockCourses;
-    private ReadWriteLock readWriteLockUsers;
     private ArrayList<Integer> courseOrder;
 
 
@@ -26,8 +24,6 @@ public class Database {
         // TODO: implement - make sure threadSafe singelton?
         coursesDB = new ConcurrentHashMap<Integer, Course>();
         usersDB = new ConcurrentHashMap<String, User>();
-        this.readWriteLockCourses = readWriteLockUsers; //TODO:FIX
-        this.readWriteLockUsers = readWriteLockUsers; //TODO:FIX
         courseOrder = new ArrayList<Integer>();
     }
 
@@ -48,20 +44,22 @@ public class Database {
         //course number
         int pointer1 = line.indexOf('|');
         int courseNum = Integer.parseInt(line.substring(0, pointer1)); //int value of string
-        line = line.substring(pointer1);
+        line = line.substring(pointer1 + 1);
         //course name
         int pointer2 = line.indexOf('|');
         String courseName = line.substring(0, pointer2);
-        line = line.substring(pointer2);
+        line = line.substring(pointer2 + 1);
         //kdam courses list
         int pointer3 = line.indexOf('|');
         String kdamCoursesString = line.substring(1, pointer3 - 1);
         ArrayList<String> kdamCoursesList = new ArrayList(Arrays.asList(kdamCoursesString.split(",")));
         ArrayList<Integer> kdamCoursesListInt = new ArrayList();
-        for (String s : kdamCoursesList) {
-            kdamCoursesListInt.add(Integer.parseInt(s));
+        if (!kdamCoursesString.equals("")) {
+            for (String s : kdamCoursesList) {
+                kdamCoursesListInt.add(Integer.parseInt(s));
+            }
         }
-        line = line.substring(pointer3);
+        line = line.substring(pointer3 + 1);
         //number of students
         int numOfMaxStudents = Integer.parseInt(line);
         return new Course(courseNum, courseName, kdamCoursesListInt, numOfMaxStudents); //course class to be implemented
@@ -76,7 +74,8 @@ public class Database {
      */
     public boolean initialize(String coursesFilePath) {
         if (pathCourses != null) throw new RuntimeException("The Database is already initialized");
-        try (BufferedReader reader = new BufferedReader(new FileReader(coursesFilePath))) //create new buffer reader
+        pathCourses=coursesFilePath;
+        try (BufferedReader reader = new BufferedReader(new FileReader(pathCourses))) //create new buffer reader
         {
             String line = reader.readLine(); // reads the first line of the txt file
             while (line != null) { //loop stops when there are no remaining lines

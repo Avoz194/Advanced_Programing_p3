@@ -2,6 +2,8 @@ package bgu.spl.net.impl.BGRSServer.SystemCommands.SingleCommands;
 
 import bgu.spl.net.impl.BGRSServer.SystemCommands.ServerCommand;
 
+import java.nio.charset.StandardCharsets;
+
 public class ACK extends ServerCommand {
     private String optionalMsg=null;
 
@@ -20,7 +22,12 @@ public class ACK extends ServerCommand {
      */
     @Override
     public byte[] encode() {
-        byte[] temp = (optionalMsg + "\0").getBytes();
+        byte[] temp;
+        if(optionalMsg!=null) {
+            temp = (optionalMsg + "\0").getBytes(StandardCharsets.UTF_8);
+        }
+        else
+            temp = "\0".getBytes();
         int num = getOpCode();
         int num2 = messageOpcode;
         byte[] bytesArr = new byte[temp.length + 4];

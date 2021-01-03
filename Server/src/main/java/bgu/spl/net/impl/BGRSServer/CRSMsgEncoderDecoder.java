@@ -95,8 +95,8 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      */
     private Commands commandToBuildA(short thisOp) {
         int indexOfFirstZero = findNextZero(nextZero);
-        byte[] subArray = Arrays.copyOfRange(bytes, 2, indexOfFirstZero - 1);
-        String userName = new String(bytes, 2, subArray.length, StandardCharsets.UTF_8);
+        byte[] subArray = Arrays.copyOfRange(bytes, 2, indexOfFirstZero);
+        String userName = new String(subArray, StandardCharsets.UTF_8);
         String passWord = new String(bytes, indexOfFirstZero + 1, len - indexOfFirstZero, StandardCharsets.UTF_8);
         len = 0;
         numberOfZeros = 0;
@@ -155,6 +155,7 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
     /**
      * getting the index of the next zero from the last
      *
+     * @param nextZe
      * @return -1 if didnt find any
      */
     private int findNextZero(int nextZe) {
