@@ -75,9 +75,9 @@ public class Database {
      * @return true if succeed anf false if not
      */
     public boolean initialize(String coursesFilePath) {
-        if (coursesFilePath != null) throw new RuntimeException("The Database is already initialized");
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(coursesFilePath)); //create new buffer reader
+        if (pathCourses != null) throw new RuntimeException("The Database is already initialized");
+        try (BufferedReader reader = new BufferedReader(new FileReader(coursesFilePath))) //create new buffer reader
+        {
             String line = reader.readLine(); // reads the first line of the txt file
             while (line != null) { //loop stops when there are no remaining lines
                 String lineClone = line;
@@ -89,8 +89,8 @@ public class Database {
                 // read next line
                 line = reader.readLine();
             }
-            reader.close();
         } catch (IOException e) { //TODO: ask what should be here
+            System.out.println("failed DB test");
             return false;
         }
         for (Course course : coursesDB.values()) { //loop on every value on courses DB
@@ -139,8 +139,9 @@ public class Database {
      * Try to register a new user if possible.
      * If already exist - return false;
      * else, create a new User entity and add to the userDb.
-     *
+     * <p>
      * #method is blocking on usersDB as isUser and put are separated methods.
+     *
      * @param userName
      * @param password
      * @param isAdmin
@@ -163,14 +164,15 @@ public class Database {
      * -The user isn't already attending this course
      * -The user has all relevant Kdams
      * -The course still has place
-     *
+     * <p>
      * #Note that in order to remain threadSafe, both the user and courses registration WriteLocks will be locked for the actions
+     *
      * @param userName
      * @param courseNumber
      * @return true if registered successfully.
      */
     public boolean registerToCourse(String userName, int courseNumber) {
-        boolean result=true;
+        boolean result = true;
         try {
             if (isRegisteredForCourse(userName, courseNumber)) return false;
         } catch (NoSuchElementException e) {
@@ -188,10 +190,10 @@ public class Database {
 
         //Make sure the user attends all courses in the kdam list for courseNumber
         for (int i : kdam) {
-            if (!user1.isAttending(i)) result= false;
+            if (!user1.isAttending(i)) result = false;
         }
         //try to addStudent to course, if doesn't have place - return false
-        if (!course1.addStudent(userName)) result= false;
+        if (!course1.addStudent(userName)) result = false;
         //add the course to the coursesList for the user.
         user1.registerToCourse(courseNumber);
 
@@ -204,6 +206,7 @@ public class Database {
     /**
      * Try to unregister the user from the course. Make sure are valid entities, and the user was attending this course.
      * #Note that in order to remain threadSafe, both the user and courses registration WriteLocks will be locked for the actions
+     *
      * @param userName
      * @param courseNumber
      * @return true if successfully done
@@ -262,7 +265,7 @@ public class Database {
     public boolean logOutUser(String userName) {
         if (!isUser(userName)) return false;
         User user1 = usersDB.get(userName);
-           return user1.setLoggedIn(false);
+        return user1.setLoggedIn(false);
 
     }
 
@@ -282,8 +285,9 @@ public class Database {
     /**
      * Return the courses the user has registered to, ordered based on the original courses.txt order.
      * Throw exception if the user doesn't exist
-     *
+     * <p>
      * #Note that in order to remain threadSafe, the user registration ReadLocks will be locked for the actions
+     *
      * @param userName
      * @return
      * @throws NoSuchElementException
@@ -306,8 +310,9 @@ public class Database {
 
     /**
      * Make sure the user is registered to this course. Throw exception in case the user/course doesn't exists.
-     *
+     * <p>
      * #Note that in order to remain threadSafe, the user registration ReadLocks will be locked for the actions
+     *
      * @param userName
      * @param courseNumber
      * @return
@@ -331,8 +336,9 @@ public class Database {
     /**
      * Return the CourseStats - number, name, available seats and registered students.
      * Throw an exception if there is no such course.
-     *
+     * <p>
      * #Note that in order to remain threadSafe, the course's registration ReadLocks will be locked for the actions
+     *
      * @param courseNumber
      * @return
      * @throws NoSuchElementException
@@ -358,8 +364,9 @@ public class Database {
     /**
      * Return the StudentStats - Name and courses he's registered too based on the order in courses.txt
      * Throw an exception if the userName isn't registered.
-     *
+     * <p>
      * #Note that in order to remain threadSafe, the user registration ReadLocks will be locked for the actions
+     *
      * @param userName
      * @return
      * @throws NoSuchElementException
