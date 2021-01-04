@@ -89,7 +89,6 @@ public class Database {
                 line = reader.readLine();
             }
         } catch (IOException e) { //TODO: ask what should be here
-            System.out.println("failed DB test");
             return false;
         }
         for (Course course : coursesDB.values()) { //loop on every value on courses DB
