@@ -180,6 +180,10 @@ public class Database {
         Course course1 = coursesDB.get(courseNumber);
         ArrayList<Integer> kdam = course1.getKdamCoursesList();
 
+        for (int i : kdam) {
+            if (!user1.isAttending(i)) return false;
+        }
+
         //WriteLock the user's and course's registration Lock
         ReadWriteLock courseRegistrationLock = course1.getCourseRegistrationLock();
         ReadWriteLock userRegistrationLock = user1.getCourseRegistrationLock();
@@ -187,13 +191,11 @@ public class Database {
         userRegistrationLock.writeLock().lock();
 
         //Make sure the user attends all courses in the kdam list for courseNumber
-        for (int i : kdam) {
-            if (!user1.isAttending(i)) result = false;
-        }
+
         //try to addStudent to course, if doesn't have place - return false
         if (!course1.addStudent(userName)) result = false;
         //add the course to the coursesList for the user.
-        user1.registerToCourse(courseNumber);
+        if(result) user1.registerToCourse(courseNumber);
 
         //unLock the user's and course's registration Lock
         courseRegistrationLock.writeLock().unlock();
@@ -370,7 +372,7 @@ public class Database {
      * @throws NoSuchElementException
      */
     public String getStudentStat(String userName) throws NoSuchElementException {
-        if (!isUser(userName)) throw new NoSuchElementException("No such user");
+        if (!isUser(userName)||isAdmin(userName)) throw new NoSuchElementException("No such student");
         User user1 = usersDB.get(userName);
         StringBuilder st = new StringBuilder();
         //Add student's name
