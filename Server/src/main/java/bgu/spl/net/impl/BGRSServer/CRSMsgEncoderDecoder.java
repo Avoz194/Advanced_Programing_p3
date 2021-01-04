@@ -31,29 +31,29 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
         if (len == 1) {
             pushByte(nextByte);
             op = getOp();
-            if ((op == ((short) 4))|(op == ((short) 4))) {
+            if ((op == ((short) 4)) | (op == ((short) 11))) {
                 return commandToBuildD(op);
             }
         }
-        if (len >= 3) { // checker to see if there are 4 bytes of data
-
+        else if (len >= 3) { // checker to see if there are 4 bytes of data
             if ((op == ((short) 1) | op == ((short) 2) | op == ((short) 3))) {
-                if (nextByte == '\0') {
+                if (nextByte == '\0' & len > 3) {
                     if (numberOfZeros == 0) { //hence first zero
                         numberOfZeros++;
                         pushByte(nextByte);
                     } else if (numberOfZeros == 1) { //hence this is the second zero
                         return commandToBuildA(op);
                     }
+                } else {
+                    pushByte(nextByte);
                 }
             } else if (op == ((short) 5) | op == ((short) 6) | op == ((short) 7) | op == ((short) 9) | op == ((short) 10)) {
                 pushByte(nextByte);
                 return commandToBuildB(op);
             } else if (op == ((short) 8)) {
-                if (nextByte == '\0') {
+                if (nextByte == '\0' & len > 3) {
                     return commandToBuildC();
-                }
-                else{
+                } else {
                     pushByte(nextByte);
                 }
             } else if (op == ((short) 12) | op == ((short) 13)) { //op 12 = ack op 13 = err
@@ -61,6 +61,8 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
             } else {
                 throw new IllegalArgumentException("there was problem with the decoding");
             }
+        } else {
+            pushByte(nextByte);
         }
         return null; //not finish yet
     }
