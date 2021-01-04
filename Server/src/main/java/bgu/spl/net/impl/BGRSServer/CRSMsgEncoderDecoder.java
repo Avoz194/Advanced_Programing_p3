@@ -28,42 +28,34 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      */
     public Commands decodeNextByte(byte nextByte) {
 
-        if (len == 1) {
-            pushByte(nextByte);
+        if (len == 2) {
             op = getOp();
-            if ((op == ((short) 4)) | (op == ((short) 11))) {
+            if (op == ((short) 4)) {
                 return commandToBuildD(op);
             }
         }
-        else if (len >= 3) { // checker to see if there are 4 bytes of data
+        if (len >= 4) { // checker to see if there are 4 bytes of data
             if ((op == ((short) 1) | op == ((short) 2) | op == ((short) 3))) {
-                if (nextByte == '\0' & len > 3) {
+                if (nextByte == '\0') {
                     if (numberOfZeros == 0) { //hence first zero
                         numberOfZeros++;
-                        pushByte(nextByte);
                     } else if (numberOfZeros == 1) { //hence this is the second zero
                         return commandToBuildA(op);
                     }
-                } else {
-                    pushByte(nextByte);
                 }
             } else if (op == ((short) 5) | op == ((short) 6) | op == ((short) 7) | op == ((short) 9) | op == ((short) 10)) {
-                pushByte(nextByte);
                 return commandToBuildB(op);
             } else if (op == ((short) 8)) {
-                if (nextByte == '\0' & len > 3) {
+                if (nextByte == '\0') {
                     return commandToBuildC();
-                } else {
-                    pushByte(nextByte);
                 }
             } else if (op == ((short) 12) | op == ((short) 13)) { //op 12 = ack op 13 = err
                 throw new IllegalArgumentException("the op is not valid for decoding");
             } else {
                 throw new IllegalArgumentException("there was problem with the decoding");
             }
-        } else {
-            pushByte(nextByte);
         }
+        pushByte(nextByte);
         return null; //not finish yet
     }
 
@@ -103,9 +95,11 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      */
     private Commands commandToBuildA(short thisOp) {
         int indexOfFirstZero = findNextZero(nextZero);
-        byte[] subArray = Arrays.copyOfRange(bytes, 2, indexOfFirstZero);
-        String userName = new String(subArray, StandardCharsets.UTF_8);
-        String passWord = new String(bytes, indexOfFirstZero + 1, len - indexOfFirstZero, StandardCharsets.UTF_8);
+        int indexOfSecondZero = findNextZero(indexOfFirstZero);
+        byte[] subArray1 = Arrays.copyOfRange(bytes, 2, indexOfFirstZero);
+        String userName = new String(subArray1, StandardCharsets.UTF_8);
+        byte[] subArray2 = Arrays.copyOfRange(bytes, indexOfFirstZero + 1, indexOfSecondZero);
+        String passWord = new String(subArray2, StandardCharsets.UTF_8);
         len = 0;
         numberOfZeros = 0;
         op = 0;
@@ -122,7 +116,8 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
     }
 
     private Commands commandToBuildB(short thisOp) {
-        String courseNumber = new String(bytes, 2, len - 3, StandardCharsets.UTF_8);
+        byte[] subArray = Arrays.copyOfRange(bytes, 2, 4);
+        String courseNumber = new String(subArray, StandardCharsets.UTF_8);
         int num = Integer.parseInt(courseNumber);
         len = 0;
         numberOfZeros = 0;
@@ -143,8 +138,9 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
     }
 
     private Commands commandToBuildC() {
-        String userName = "";
-        userName = new String(bytes, 2, len - 3, StandardCharsets.UTF_8);
+        int indexOfFirstZero = findNextZero(nextZero);
+        byte[] subArray = Arrays.copyOfRange(bytes, 2, indexOfFirstZero);
+        String userName = new String(subArray, StandardCharsets.UTF_8);
         len = 0;
         op = 0;
         return new StudentStat(userName);
