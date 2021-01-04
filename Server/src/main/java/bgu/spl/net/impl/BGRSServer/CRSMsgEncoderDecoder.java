@@ -37,7 +37,7 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
         }
         else if (len >= 3) { // checker to see if there are 4 bytes of data
             if ((op == ((short) 1) | op == ((short) 2) | op == ((short) 3))) {
-                if (nextByte == '\0' & len > 3) {
+                if (nextByte == '\0' ) {
                     if (numberOfZeros == 0) { //hence first zero
                         numberOfZeros++;
                         pushByte(nextByte);
@@ -51,7 +51,7 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
                 pushByte(nextByte);
                 return commandToBuildB(op);
             } else if (op == ((short) 8)) {
-                if (nextByte == '\0' & len > 3) {
+                if (nextByte == '\0') {
                     return commandToBuildC();
                 } else {
                     pushByte(nextByte);
@@ -125,8 +125,10 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
 
     private Commands commandToBuildB(short thisOp) {
         byte[] subArray = Arrays.copyOfRange(bytes, 2, 4);
-        String courseNumber = new String(subArray, StandardCharsets.UTF_8);
-        int num = Integer.parseInt(courseNumber);
+       // String courseNumber = new String(subArray, StandardCharsets.UTF_8); //TODO:make sure to remove
+        short result = (short) ((subArray[0] & 0xff) << 8);
+        result += (short) (subArray[1] & 0xff);
+        int num = result;
         len = 0;
         numberOfZeros = 0;
         op = 0;
