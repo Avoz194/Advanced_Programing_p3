@@ -103,10 +103,10 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      */
     private Commands commandToBuildA(short thisOp) {
         int indexOfFirstZero = findNextZero(nextZero);
-        int indexOfSecondZero = findNextZero(indexOfFirstZero);
+       // int indexOfSecondZero = findNextZero(indexOfFirstZero);
         byte[] subArray1 = Arrays.copyOfRange(bytes, 2, indexOfFirstZero);
         String userName = new String(subArray1, StandardCharsets.UTF_8);
-        byte[] subArray2 = Arrays.copyOfRange(bytes, indexOfFirstZero + 1, indexOfSecondZero);
+        byte[] subArray2 = Arrays.copyOfRange(bytes, indexOfFirstZero + 1, len);
         String passWord = new String(subArray2, StandardCharsets.UTF_8);
         len = 0;
         numberOfZeros = 0;
@@ -146,8 +146,8 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
     }
 
     private Commands commandToBuildC() {
-        int indexOfFirstZero = findNextZero(nextZero);
-        byte[] subArray = Arrays.copyOfRange(bytes, 2, indexOfFirstZero);
+       // int indexOfFirstZero = findNextZero(nextZero);
+        byte[] subArray = Arrays.copyOfRange(bytes, 2, len);
         String userName = new String(subArray, StandardCharsets.UTF_8);
         len = 0;
         op = 0;
