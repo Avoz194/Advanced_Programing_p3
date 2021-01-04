@@ -29,7 +29,7 @@ public class CRSMessagingProtocol implements MessagingProtocol<Commands> {
         /*Validation:
             -If the user should be logged in to preform the command
             -If the user is not allowed to (Admin VS Student).
-            -If the user is already logged in and try to log-in
+            -If the user is already logged in and try to log-in/Register
          */
         if ((opCode > 3) & (userName == null) || ((opCode > 4) && userTypeVerify(msg)) || ((opCode <4 ) & (userName != null))) {
             return new ERR(msg.getOpCode());

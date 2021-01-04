@@ -28,26 +28,33 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      */
     public Commands decodeNextByte(byte nextByte) {
 
-        if (len == 2) {
+        if (len == 1) {
+            pushByte(nextByte);
             op = getOp();
-            if (op == ((short) 4)) {
+            if ((op == ((short) 4))|(op == ((short) 4))) {
                 return commandToBuildD(op);
             }
         }
-        if (len >= 4) { // checker to see if there are 4 bytes of data
+        if (len >= 3) { // checker to see if there are 4 bytes of data
+
             if ((op == ((short) 1) | op == ((short) 2) | op == ((short) 3))) {
                 if (nextByte == '\0') {
                     if (numberOfZeros == 0) { //hence first zero
                         numberOfZeros++;
+                        pushByte(nextByte);
                     } else if (numberOfZeros == 1) { //hence this is the second zero
                         return commandToBuildA(op);
                     }
                 }
             } else if (op == ((short) 5) | op == ((short) 6) | op == ((short) 7) | op == ((short) 9) | op == ((short) 10)) {
+                pushByte(nextByte);
                 return commandToBuildB(op);
             } else if (op == ((short) 8)) {
                 if (nextByte == '\0') {
                     return commandToBuildC();
+                }
+                else{
+                    pushByte(nextByte);
                 }
             } else if (op == ((short) 12) | op == ((short) 13)) { //op 12 = ack op 13 = err
                 throw new IllegalArgumentException("the op is not valid for decoding");
@@ -55,7 +62,6 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
                 throw new IllegalArgumentException("there was problem with the decoding");
             }
         }
-        pushByte(nextByte);
         return null; //not finish yet
     }
 
