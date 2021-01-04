@@ -60,7 +60,7 @@ public class User {
      * @param course
      */
     public void unregisterFromCourse(int course) {
-        listOfCoursesAttendTo.remove(course);
+        listOfCoursesAttendTo.remove(listOfCoursesAttendTo.indexOf(course));
     }
 
     /**
