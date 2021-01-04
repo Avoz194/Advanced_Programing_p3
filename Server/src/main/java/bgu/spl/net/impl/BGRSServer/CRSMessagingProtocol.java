@@ -31,7 +31,7 @@ public class CRSMessagingProtocol implements MessagingProtocol<Commands> {
             -If the user is not allowed to (Admin VS Student).
             -If the user is already logged in and try to log-in/Register
          */
-        if ((opCode > 3) & (userName == null) || ((opCode > 4) && userTypeVerify(msg)) || ((opCode <4 ) & (userName != null))) {
+        if (((opCode > 3) & (userName == null)) || ((opCode > 4) && !userTypeVerify(msg)) || ((opCode < 4) & (userName != null))) {
             return new ERR(msg.getOpCode());
         }
         //update the user name in the Command
@@ -69,12 +69,12 @@ public class CRSMessagingProtocol implements MessagingProtocol<Commands> {
     private boolean userTypeVerify(Commands op) {
         boolean isAdmin;
         try {
-            isAdmin=Database.getInstance().isAdmin(userName);
+            isAdmin = Database.getInstance().isAdmin(userName);
         } catch (NoSuchElementException e) {
             return false;
         }
         boolean isAdminCommand = AdminCommand.class.isInstance(op);
-        if ((!isAdmin & isAdminCommand) | (isAdmin & !isAdminCommand)) {
+        if (isAdminCommand!=isAdmin) {
             return false;
         }
         return true;
