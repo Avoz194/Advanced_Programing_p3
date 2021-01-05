@@ -279,7 +279,7 @@ public class Database {
      */
     public String getKdamForCourse(int courseNumber) throws NoSuchElementException {
         if (!isCourse(courseNumber)) throw new NoSuchElementException("No such Course");
-        return coursesDB.get(courseNumber).getKdamCoursesList().toString(); //TODO:make sure good toString;
+        return coursesDB.get(courseNumber).getKdamCoursesList().toString().replace(" ", ""); //TODO:make sure good toString;
     }
 
     /**
@@ -305,7 +305,7 @@ public class Database {
         courseRegistrationLock.readLock().unlock();
 
         temp.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o)));
-        return temp.toString(); //TODO:make sure good toString
+        return temp.toString().replace(" ", ""); //TODO:make sure good toString
     }
 
     /**
@@ -356,7 +356,7 @@ public class Database {
         st.append("Seats Available: " + course1.getNumOfAvailableSeats() + "/" + course1.getNumOfMaxStudents());
         st.append("\n");
         //Add registered students
-        st.append("Students Registered: " + course1.getListOfStudents().toString());
+        st.append("Students Registered: " + course1.getListOfStudents().toString().replace(" ", ""));
         courseRegistrationLock.readLock().unlock();
         return st.toString();
     }//TODO:implement
@@ -384,7 +384,7 @@ public class Database {
         Vector<Integer> sorted = user1.getListOfCoursesAttendTo();
         courseRegistrationLock.readLock().unlock();
         sorted.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o)));
-        st.append("Courses: " + sorted.toString());
+        st.append("Courses: " + sorted.toString().replace(" ", ""));
         return st.toString();
     }
 }

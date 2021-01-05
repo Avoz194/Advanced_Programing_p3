@@ -1,7 +1,7 @@
 package bgu.spl.net.impl.BGRSServer.DB;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -49,8 +49,10 @@ public class Course {
         return numOfAvailableSeats;
     }
 
-    public Set<String> getListOfStudents() {
-        return listOfStudents;
+    public ArrayList<String> getListOfStudents() {
+        ArrayList<String> list = new ArrayList<>(listOfStudents);
+        list.sort(Comparator.naturalOrder());
+        return list;
     }
 
     /**
