@@ -7,6 +7,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * Class to create "Course" object, which will contain all the data relevant for the specific course.
+ * Implement it's own Sync procedure using the ReadWriteLock activated from the Database class.
+ */
 public class Course {
     //courseNum|courseName|KdamCoursesList|numOfMaxStudents
     private int courseNum;

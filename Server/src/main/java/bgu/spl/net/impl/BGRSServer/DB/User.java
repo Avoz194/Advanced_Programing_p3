@@ -4,6 +4,10 @@ import java.util.Vector;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * Class to create "Course" object, which will contain all the data relevant for the specific course.
+ * Implement it's own Sync procedure using the ReadWriteLock activated from the Database class.
+ */
 public class User {
     private String userName;
     private String pass;

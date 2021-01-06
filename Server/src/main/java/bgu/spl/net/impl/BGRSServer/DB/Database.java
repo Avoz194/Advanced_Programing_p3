@@ -34,7 +34,7 @@ public class Database {
     }
 
     /**
-     * makes Course Object from string line.
+     * Parse a Course Object from a single string line.
      *
      * @param line
      * @return course object
@@ -67,6 +67,7 @@ public class Database {
     /**
      * loades the courses from the file path {@code coursesFilePath }specified
      * into the Database, returns true if successful.
+     * At the end of procedure, sort the KdamCourses for each Course Object based on the order in the Courses.txt file (stored in @courseOrder array)
      *
      * @param coursesFilePath
      * @return true if succeed anf false if not

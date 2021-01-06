@@ -2,7 +2,6 @@ package bgu.spl.net.impl.BGRSServer;
 
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.impl.BGRSServer.SystemCommands.Commands;
-import bgu.spl.net.impl.BGRSServer.SystemCommands.ServerCommand;
 import bgu.spl.net.impl.BGRSServer.SystemCommands.SingleCommands.*;
 
 import java.nio.charset.StandardCharsets;
@@ -103,7 +102,6 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
      */
     private Commands commandToBuildA(short thisOp) {
         int indexOfFirstZero = findNextZero(nextZero);
-       // int indexOfSecondZero = findNextZero(indexOfFirstZero);
         byte[] subArray1 = Arrays.copyOfRange(bytes, 2, indexOfFirstZero);
         String userName = new String(subArray1, StandardCharsets.UTF_8);
         byte[] subArray2 = Arrays.copyOfRange(bytes, indexOfFirstZero + 1, len);
