@@ -14,7 +14,7 @@ public class Course {
     private ArrayList<Integer> KdamCoursesList;
     private int numOfMaxStudents;
     private int numOfAvailableSeats;
-    private Set<String> listOfStudents; //TODO: make sure ThreadSafe
+    private Set<String> listOfStudents;
     private ReadWriteLock courseRegistrationLock;
 
 

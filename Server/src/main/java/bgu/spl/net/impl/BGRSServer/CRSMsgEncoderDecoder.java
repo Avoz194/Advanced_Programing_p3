@@ -125,7 +125,6 @@ public class CRSMsgEncoderDecoder implements MessageEncoderDecoder<Commands> {
 
     private Commands commandToBuildB(short thisOp) {
         byte[] subArray = Arrays.copyOfRange(bytes, 2, 4);
-       // String courseNumber = new String(subArray, StandardCharsets.UTF_8); //TODO:make sure to remove
         short result = (short) ((subArray[0] & 0xff) << 8);
         result += (short) (subArray[1] & 0xff);
         int num = result;

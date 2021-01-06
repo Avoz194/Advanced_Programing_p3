@@ -12,7 +12,7 @@ public class Database {
         private static Database instance = new Database();
     }
 
-    //TODO:SYNC
+
     private String pathCourses = null;
     private ConcurrentHashMap<Integer, Course> coursesDB;
     private ConcurrentHashMap<String, User> usersDB;
@@ -21,7 +21,6 @@ public class Database {
 
     //to prevent user from creating new Database
     private Database() {
-        // TODO: implement - make sure threadSafe singelton?
         coursesDB = new ConcurrentHashMap<Integer, Course>();
         usersDB = new ConcurrentHashMap<String, User>();
         courseOrder = new ArrayList<Integer>();
@@ -88,7 +87,7 @@ public class Database {
                 // read next line
                 line = reader.readLine();
             }
-        } catch (IOException e) { //TODO: ask what should be here
+        } catch (IOException e) {
             return false;
         }
         for (Course course : coursesDB.values()) { //loop on every value on courses DB
@@ -279,7 +278,7 @@ public class Database {
      */
     public String getKdamForCourse(int courseNumber) throws NoSuchElementException {
         if (!isCourse(courseNumber)) throw new NoSuchElementException("No such Course");
-        return coursesDB.get(courseNumber).getKdamCoursesList().toString().replace(" ", ""); //TODO:make sure good toString;
+        return coursesDB.get(courseNumber).getKdamCoursesList().toString().replace(" ", "");
     }
 
     /**
@@ -305,7 +304,7 @@ public class Database {
         courseRegistrationLock.readLock().unlock();
 
         temp.sort(Comparator.comparingInt(o -> courseOrder.indexOf(o)));
-        return temp.toString().replace(" ", ""); //TODO:make sure good toString
+        return temp.toString().replace(" ", "");
     }
 
     /**
@@ -359,7 +358,7 @@ public class Database {
         st.append("Students Registered: " + course1.getListOfStudents().toString().replace(" ", ""));
         courseRegistrationLock.readLock().unlock();
         return st.toString();
-    }//TODO:implement
+    }
 
     /**
      * Return the StudentStats - Name and courses he's registered too based on the order in courses.txt

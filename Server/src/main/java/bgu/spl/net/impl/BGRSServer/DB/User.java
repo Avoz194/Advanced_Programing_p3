@@ -10,7 +10,7 @@ public class User {
     private boolean isAdmin;
     private boolean isLoggedIn;
     private Object isloggedInLock = new Object();
-    private Vector<Integer> listOfCoursesAttendTo; //TODO:consider different DataStructure
+    private Vector<Integer> listOfCoursesAttendTo;
     private ReadWriteLock courseRegistrationLock;
 
     public User(String userName, String pass, boolean isAdmin) {
